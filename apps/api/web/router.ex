@@ -13,12 +13,22 @@ defmodule Api.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", Api do
-    pipe_through :api # Use the default browser stack
+  scope "/v2", Api do
+    pipe_through :api
 
-    get "/", PageController, :index
-    put "/", PageController, :upload
+    get    "/", PageController, :index
+    get    "/_catalog", ImageController,:catalog
+    get    "/*name",DockerRouter,:get
+    post   "/*name",DockerRouter,:post
+    put    "/*name",DockerRouter,:put
+    head   "/*name",DockerRouter,:head
+    delete "/*name",DockerRouter,:delete
+    get    "/manifests/:reference", ManifestController,:show
+    get    "/blobs／:digest", BlobController,:download
+    get    "/blobs/uploads/:uuid", BlobController,:uploads
   end
+
+
 
   # Other scopes may use custom stacks.
   # scope "/api", Api do
