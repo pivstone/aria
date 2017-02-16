@@ -4,7 +4,7 @@ defmodule Api.DockerRouter do
 
   @name_patterns "(?P<name>[a-z0-9]+(?:[._\/-][a-z0-9]+)*)"
   @reference_patterns "/((?P<digest>([a-z0-9]{4,6}:[a-z0-9]{32,}$))|(?P<tag>([a-z0-9][a-z0-9.-]{0,127}$)))"
-  @manifest_url Regex.compile!("/v2/#{@name_patterns}/manifest#{@reference_patterns}")
+  @manifest_url Regex.compile!("/v2/#{@name_patterns}/manifests#{@reference_patterns}")
 
   def call(%Plug.Conn{} = conn, :get) do
     cond do
