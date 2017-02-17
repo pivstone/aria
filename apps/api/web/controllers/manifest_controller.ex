@@ -22,10 +22,4 @@ defmodule Api.ManifestController do
     render conn, "index.json",data: params
   end
 
-  @doc """
-  检车 Manifest 是否存在
-  """
-  def head(conn,params) do
-    render conn, "index.json",data: params
-  end
 end

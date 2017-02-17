@@ -11,6 +11,7 @@ defmodule Api.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Plug.Head
   end
 
   scope "/v2", Api do
@@ -21,7 +22,6 @@ defmodule Api.Router do
     get    "/*name",    DockerRouter,   :get
     post   "/*name",    DockerRouter,   :post
     put    "/*name",    DockerRouter,   :put
-    head   "/*name",    DockerRouter,   :head
     delete "/*name",    DockerRouter,   :delete
     patch  "/*name",    DockerRouter,   :patch
   end

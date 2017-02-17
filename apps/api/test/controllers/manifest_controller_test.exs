@@ -27,7 +27,7 @@ defmodule Api.ManifestControllerTest do
     name = "test/test"
     ref = "1-dev"
     conn = head conn, "/v2/#{name}/manifests/#{ref}"
-    assert json_response(conn, 200) == %{"name" => name, "digest" => "", "tag" => ref}
+    assert response(conn, 200)
   end
 
   test "GET manifests fetch invalid url resolve", %{conn: conn} do
