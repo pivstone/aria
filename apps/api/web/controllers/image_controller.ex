@@ -5,7 +5,7 @@ defmodule Api.ImageController do
     render conn, "catalog.json",image: []
   end
 
-  def tag_list(conn, %{"name" => name}) do
+  def get(conn, %{"name" => name}) do
     render conn, "tag_list.json",%{ tag: [],name: name}
   end
 end

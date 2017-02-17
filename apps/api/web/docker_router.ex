@@ -8,6 +8,7 @@ defmodule Api.DockerRouter do
   @manifest_url Regex.compile!("^/v2#{@name_patterns}/manifests#{@reference_patterns}")
   @uuid_patterns "(?P<uuid>[a-z0-9]+(?:[._-][a-z0-9]+)*$)"
   @blob_url Regex.compile!("^/v2#{@name_patterns}/blobs/#{@uuid_patterns}")
+  @blob_upload_url Regex.compile!("^/v2#{@name_patterns}/blobs/uploads/")
   @tag_url Regex.compile!("^/v2#{@name_patterns}/tags/list")
   @doc """
   CN: Docker 的路由跳转
@@ -18,11 +19,15 @@ defmodule Api.DockerRouter do
       (params = Regex.named_captures(@tag_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
-        |> Api.ImageController.call(Api.ImageController.init(:tag_list))
+        |> Api.ImageController.call(Api.ImageController.init(:get))
       (params = Regex.named_captures(@manifest_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
-        |> Api.ManifestController.call(Api.ManifestController.init(:show))
+        |> Api.ManifestController.call(Api.ManifestController.init(:get))
+      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.BlobController.call(Api.BlobController.init(:get))
       true ->
         conn
         |> send_resp(404,"not_found")
@@ -32,11 +37,14 @@ defmodule Api.DockerRouter do
 
   def call(%Plug.Conn{} = conn, :post) do
     cond do
-      String.ends_with?(conn.request_path,"/blobs/uploads/") ->
-        "/v2/" <> name = conn.request_path
-        name = name |> String.slice(0..-16)
-        conn = merge_params(conn,%{"name" => name})
-        Api.ImageController.call(conn, Api.BlobController.init(:init_upload))
+      (params = Regex.named_captures(@blob_upload_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.BlobController.call(Api.BlobController.init(:init_upload))
+      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.BlobController.call(Api.BlobController.init(:post))
       true ->
         conn
         |> send_resp(404,"not_found")
@@ -46,7 +54,27 @@ defmodule Api.DockerRouter do
 
   def call(%Plug.Conn{} = conn, :head) do
     cond do
-      true -> conn
+      (params = Regex.named_captures(@manifest_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.ManifestController.call(Api.ManifestController.init(:head))
+      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.BlobController.call(Api.BlobController.init(:head))
+      true ->
+        conn
+        |> send_resp(404,"not_found")
+        |> halt
+    end
+  end
+
+  def call(%Plug.Conn{} = conn, :patch) do
+    cond do
+      true ->
+        conn
+        |> send_resp(404,"not_found")
+        |> halt
     end
   end
 
@@ -55,11 +83,11 @@ defmodule Api.DockerRouter do
       (params = Regex.named_captures(@manifest_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
-        |> Api.ManifestController.call(Api.ManifestController.init(:save))
+        |> Api.ManifestController.call(Api.ManifestController.init(:put))
       (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
-        |> Api.BlobController.call(Api.BlobController.init(:upload))
+        |> Api.BlobController.call(Api.BlobController.init(:put))
       true ->
         conn
         |> send_resp(404,"not_found")
@@ -69,6 +97,15 @@ defmodule Api.DockerRouter do
 
   def call(%Plug.Conn{} = conn, :delete) do
     cond do
+      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.BlobController.call(Api.BlobController.init(:delete))
+
+      (params = Regex.named_captures(@manifest_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.ManifestController.call(Api.ManifestController.init(:delete))
       true ->
         conn
         |> send_resp(404,"not_found")

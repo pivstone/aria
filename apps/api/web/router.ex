@@ -16,22 +16,14 @@ defmodule Api.Router do
   scope "/v2", Api do
     pipe_through :api
 
-    get    "/", PageController, :index
+    get    "/",         PageController, :index
     get    "/_catalog", ImageController,:catalog
-    get    "/*name",DockerRouter,:get
-    post   "/*name",DockerRouter,:post
-    put    "/*name",DockerRouter,:put
-    head   "/*name",DockerRouter,:head
-    delete "/*name",DockerRouter,:delete
-    get    "/manifests/:reference", ManifestController,:show
-    get    "/blobs／:digest", BlobController,:download
-    get    "/blobs/uploads/:uuid", BlobController,:uploads
+    get    "/*name",    DockerRouter,   :get
+    post   "/*name",    DockerRouter,   :post
+    put    "/*name",    DockerRouter,   :put
+    head   "/*name",    DockerRouter,   :head
+    delete "/*name",    DockerRouter,   :delete
+    patch  "/*name",    DockerRouter,   :patch
   end
 
-
-
-  # Other scopes may use custom stacks.
-  # scope "/api", Api do
-  #   pipe_through :api
-  # end
 end
