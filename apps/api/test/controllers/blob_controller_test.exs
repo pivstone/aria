@@ -37,6 +37,14 @@ defmodule Api.BlobControllerTest do
     assert response(conn, 200)
   end
 
+
+  test "PATCH blob  url resolve", %{conn: conn} do
+    name = "test/test"
+    uuid = "1234-123140123-1234-1231"
+    conn = patch conn, "/v2/#{name}/blobs/#{uuid}"
+    assert response(conn, 200)
+  end
+
   test "PUT blob upload invalid url resolve", %{conn: conn} do
     name = "Test/test"
     uuid = "1@234-1231"
@@ -71,4 +79,12 @@ defmodule Api.BlobControllerTest do
     conn = head conn, "/v2/#{name}/blobs/#{uuid}"
     assert response(conn, 404)
   end
+
+  test "PATCH blob  invalid url resolve", %{conn: conn} do
+    name = "Test/test"
+    uuid = "1@234-1231"
+    conn = patch conn, "/v2/#{name}/blobs/#{uuid}"
+    assert response(conn, 404)
+  end
+
 end

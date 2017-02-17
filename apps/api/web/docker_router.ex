@@ -71,6 +71,10 @@ defmodule Api.DockerRouter do
 
   def call(%Plug.Conn{} = conn, :patch) do
     cond do
+      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+        conn
+        |> merge_params(params)
+        |> Api.BlobController.call(Api.BlobController.init(:patch))
       true ->
         conn
         |> send_resp(404,"not_found")
