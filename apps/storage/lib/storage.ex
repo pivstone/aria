@@ -2,17 +2,9 @@ defmodule Storage do
   @moduledoc """
   Documentation for Storage.
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Storage.hello
-      :world
-
-  """
-  def hello do
-    :world
+  @default_driver Storage.FileDriver
+  def driver do
+    Application.get_env(:storage, __MODULE__, [])[:driver]||@default_driver
   end
+
 end

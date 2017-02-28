@@ -17,4 +17,10 @@ import_config "../apps/*/config/config.exs"
 #       metadata: [:user_id]
 
 
+config :storage, Storage.PathSepc,
+	data_dir: "/tmp"
+
+config :storage, Storage,
+	driver: Storage.FileDriver
+
 import_config "#{Mix.env}.exs"

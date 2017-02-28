@@ -23,6 +23,12 @@ defmodule Api.BlobControllerTest do
     assert json_response(conn, 200) == %{}
   end
 
+  test "POST  init blob  url resolve", %{conn: conn} do
+    name = "test/test"
+    conn = post conn, "/v2/#{name}/blobs/uploads/"
+    assert response(conn, 202)
+  end
+
   test "GET blob  url resolve", %{conn: conn} do
     name = "test/test"
     uuid = "1234-123140123-1234-1231"
