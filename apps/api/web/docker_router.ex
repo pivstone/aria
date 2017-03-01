@@ -3,12 +3,16 @@ defmodule Api.DockerRouter do
 
   def init(opts), do: opts
 
+  require Logger
+
   @name_patterns "/(?P<name>[a-z0-9]+(?:[._\/-][a-z0-9]+)*)"
+  @digest_patterns "/(?P<digest>([a-z0-9]{4,6}:[a-z0-9]{32,}$))"
   @reference_patterns "/((?P<digest>([a-z0-9]{4,6}:[a-z0-9]{32,}$))|(?P<tag>([a-z0-9][a-z0-9.-]{0,127}$)))"
   @manifest_url Regex.compile!("^/v2#{@name_patterns}/manifests#{@reference_patterns}")
   @uuid_patterns "(?P<uuid>[a-z0-9]+(?:[._-][a-z0-9]+)*$)"
-  @blob_url Regex.compile!("^/v2#{@name_patterns}/blobs/#{@uuid_patterns}")
+  @blob_url Regex.compile!("^/v2#{@name_patterns}/blobs#{@digest_patterns}")
   @blob_upload_url Regex.compile!("^/v2#{@name_patterns}/blobs/uploads/")
+  @blob_post_url Regex.compile!("^/v2#{@name_patterns}/blobs/uploads/#{@uuid_patterns}")
   @tag_url Regex.compile!("^/v2#{@name_patterns}/tags/list")
   @doc """
   CN: Docker 的路由跳转
@@ -41,7 +45,7 @@ defmodule Api.DockerRouter do
         conn
         |> merge_params(params)
         |> Api.BlobController.call(Api.BlobController.init(:init_upload))
-      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+      (params = Regex.named_captures(@blob_post_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
         |> Api.BlobController.call(Api.BlobController.init(:post))
@@ -71,7 +75,7 @@ defmodule Api.DockerRouter do
 
   def call(%Plug.Conn{} = conn, :patch) do
     cond do
-      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+      (params = Regex.named_captures(@blob_post_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
         |> Api.BlobController.call(Api.BlobController.init(:patch))

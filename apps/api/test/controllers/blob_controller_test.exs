@@ -4,23 +4,23 @@ defmodule Api.BlobControllerTest do
 
   test "PUT blob upload url resolve", %{conn: conn} do
     name = "test/test"
-    uuid = "1234-123140123-1234-1231"
-    conn = put conn, "/v2/#{name}/blobs/#{uuid}"
+    digest = "sha256:046e44ee6057f1264d00b0c54adcff2f2c44d30a29b50dfef928776f7aa45cc8"
+    conn = put conn, "/v2/#{name}/blobs/#{digest}"
     assert json_response(conn, 200) == %{}
   end
 
   test "DELETE blob  url resolve", %{conn: conn} do
     name = "test/test"
-    uuid = "1234-123140123-1234-1231"
-    conn = delete conn, "/v2/#{name}/blobs/#{uuid}"
+    digest = "sha256:046e44ee6057f1264d00b0c54adcff2f2c44d30a29b50dfef928776f7aa45cc8"
+    conn = delete conn, "/v2/#{name}/blobs/#{digest}"
     assert json_response(conn, 200) == %{}
   end
 
-  test "POST blob  url resolve", %{conn: conn} do
+  test "POST blob uploads url resolve", %{conn: conn} do
     name = "test/test"
     uuid = "1234-123140123-1234-1231"
-    conn = post conn, "/v2/#{name}/blobs/#{uuid}"
-    assert json_response(conn, 200) == %{}
+    conn = post conn, "/v2/#{name}/blobs/uploads/#{uuid}"
+    assert response(conn, 202)
   end
 
   test "POST  init blob  url resolve", %{conn: conn} do
@@ -31,15 +31,15 @@ defmodule Api.BlobControllerTest do
 
   test "GET blob  url resolve", %{conn: conn} do
     name = "test/test"
-    uuid = "1234-123140123-1234-1231"
-    conn = get conn, "/v2/#{name}/blobs/#{uuid}"
-    assert json_response(conn, 200) == %{}
+    digest = "sha256:046e44ee6057f1264d00b0c54adcff2f2c44d30a29b50dfef928776f7aa45cc8"
+    conn = get conn, "/v2/#{name}/blobs/#{digest}"
+    assert response(conn, 200) == "test"
   end
 
   test "HEAD blob  url resolve", %{conn: conn} do
     name = "test/test"
-    uuid = "1234-123140123-1234-1231"
-    conn = head conn, "/v2/#{name}/blobs/#{uuid}"
+    digest = "sha256:046e44ee6057f1264d00b0c54adcff2f2c44d30a29b50dfef928776f7aa45cc8"
+    conn = head conn, "/v2/#{name}/blobs/#{digest}"
     assert response(conn, 200)
   end
 
@@ -47,7 +47,7 @@ defmodule Api.BlobControllerTest do
   test "PATCH blob  url resolve", %{conn: conn} do
     name = "test/test"
     uuid = "1234-123140123-1234-1231"
-    conn = patch conn, "/v2/#{name}/blobs/#{uuid}"
+    conn = patch conn, "/v2/#{name}/blobs/uploads/#{uuid}"
     assert response(conn, 200)
   end
 

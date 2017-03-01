@@ -1,16 +1,29 @@
 defmodule Api.BlobController do
 	use Api.Web, :controller
 
-  def get(conn, _params) do
-    render conn, "index.json",tag: []
+  @doc """
+  获取 Blob 对象
+  """
+
+  def get(conn, %{"name" => name,"digest" => digest} = _params) do
+    blob_path = Storage.PathSepc.get_blob_path(name,digest)
+    send_file(conn, :ok, blob_path)
   end
 
   def put(conn, _params) do
     render conn, "index.json",tag: []
   end
+  @doc """
+  检查 Blob 对象是否存在
+  """
 
-  def head(conn, _params) do
-    render conn, "index.json",tag: []
+  def head(conn, %{"name" => name,"digest" => digest} = _params) do
+    blob_path = Storage.PathSepc.get_blob_path(name,digest)
+    if File.exists?(blob_path) do
+      send_resp(conn, :ok, "")
+    else
+      send_resp(conn, :not_found, "")
+    end
   end
 
   def patch(conn, _params) do
@@ -27,7 +40,7 @@ defmodule Api.BlobController do
   :param request: Http 请求对象
   :param name: 镜像名
   """
-  def init_upload(conn, %{"name" => name} = _params) when byte_size(name) > 256 do
+  def init_upload(_conn, %{"name" => name} = _params) when byte_size(name) > 256 do
      raise :NameInvalidException
   end
 
