@@ -4,13 +4,17 @@ defmodule Api.BlobController do
   @doc """
   获取 Blob 对象
   """
-
-  def get(conn, %{"name" => name,"digest" => digest} = _params) do
-    blob_path = Storage.PathSepc.get_blob_path(name,digest)
+  def get(conn, %{"name" => name, "digest" => digest} = _params) do
+    blob_path = Storage.PathSepc.get_blob_path(name, digest)
     send_file(conn, :ok, blob_path)
   end
 
-  def put(conn, _params) do
+  @doc """
+  完成 Blob 上传流程。并进行必要的检查
+  """
+
+  def put(conn, %{"name" => name, "digest" => digest, "uuid" => uuid} =_params) do
+    blob_path = Storage.PathSepc.get_blob_path(name, digest)
     render conn, "index.json",tag: []
   end
   @doc """
