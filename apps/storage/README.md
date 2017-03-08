@@ -1,6 +1,5 @@
 # Storage
 
-**TODO: Add description**
 
 ## Installation
 

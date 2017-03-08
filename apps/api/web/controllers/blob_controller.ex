@@ -15,7 +15,16 @@ defmodule Api.BlobController do
 
   def put(conn, %{"name" => name, "digest" => digest, "uuid" => uuid} =_params) do
     blob_path = Storage.PathSepc.get_blob_path(name, digest)
-    render conn, "index.json",tag: []
+    [hash_method, value] = digest |> String.split(":", parts: 2)
+    file_digest = Storage.driver().get_blob_digest(name, uuid, hash_method)
+    if value != file_digest do
+      raise BlobDigestInvalidException
+    end
+    Storage.driver().commit(name, uuid, digest)
+    conn
+      |> put_req_header("location", conn.request_path <> upload_id)
+      |> put_req_header("docker-upload-uuid",upload_id)
+      |> send_resp(204, "")
   end
   @doc """
   检查 Blob 对象是否存在
