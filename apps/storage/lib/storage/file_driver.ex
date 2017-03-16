@@ -36,4 +36,12 @@ defmodule Storage.FileDriver do
         File.mkdir_p(dir_name)
 		end
 	end
+
+	def get_repositories(keyword,count \\ 10) do
+     Path.wildcard("#{Storage.PathSepc.data_dir}/**/_uploads",keyword)
+     |> Enum.slice(1..count)
+     |> Enum.reduce([],fn(Storage.PathSepc.data_dir <> x,acc) ->
+			  [x |> String.slice(0..-8) |acc]
+     end)
+	end
 end

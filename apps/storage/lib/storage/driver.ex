@@ -20,4 +20,9 @@ defmodule Storage.Driver do
   提交 upload 文件
   """
   @callback commit(image_name, String.t, String.t) :: none
+
+  @doc """
+  查找 Repo
+  """
+  @callback get_repositories(String.t, number) :: [String.t]
 end
