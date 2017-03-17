@@ -54,7 +54,7 @@ defmodule Storage.FileDriver do
 	end
 
 	def save_full_upload(path, image_name, uuid) do
-		file_name = Storage.PathSep.get_upload_path(image_name, uuid)
+		file_name = Storage.PathSepc.get_upload_path(image_name, uuid)
 		ensure_dir(file_name)
 		File.rename(path, file_name)
 		%{size: size} = File.stat! file_name

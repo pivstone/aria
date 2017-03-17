@@ -13,6 +13,7 @@ defmodule Api.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Plug.Parsers, parsers: [:urlencoded, :json,Api.Parsers.Chunked]
     plug Plug.Head
   end
 
@@ -38,7 +39,7 @@ defmodule Api.Router do
     |> send_resp(conn.status,body)
   end
 
-  def handle_errors(conn, assigns) do
+  def handle_errors(conn, _assigns) do
     send_resp(conn, conn.status, "Something went wrong")
   end
 end

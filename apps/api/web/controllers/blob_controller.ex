@@ -15,7 +15,6 @@ defmodule Api.BlobController do
   """
 
   def put(conn, %{"name" => name, "digest" => digest, "uuid" => uuid} =_params) do
-    blob_path = Storage.PathSepc.get_blob_path(name, digest)
     [hash_method, value] = digest |> String.split(":", parts: 2)
     file_digest = Storage.driver().get_blob_digest(name, uuid, hash_method)
     if value != file_digest do
@@ -44,12 +43,12 @@ defmodule Api.BlobController do
     end
   end
 
-  def patch(conn, %{"name" => name,  "uuid" => uuid} =_params) do
-    length = Storage.driver().save_full_upload(conn._upload, name, uuid)
+  def patch(conn, %{"name" => name,  "uuid" => uuid, "_upload" => path} =_params) do
+    len = Storage.driver().save_full_upload(path, name, uuid)
     conn
       |> put_req_header("location", conn.request_path <> uuid)
       |> put_req_header("docker-upload-uuid",uuid)
-      |> put_req_header("range","0-#{length}")
+      |> put_req_header("range","0-#{len}")
       |> send_resp(202, "")
   end
 
@@ -64,7 +63,11 @@ defmodule Api.BlobController do
   :param name: 镜像名
   """
   def init_upload(_conn, %{"name" => name} = _params) when byte_size(name) > 256 do
-     raise :NameInvalidException
+    Logger.warn("Image name invalid : #{name}")
+    raise Api.DockerError,message: "invalid repository name",
+                         code: "NAME_INVALID",
+                         plug_status: 400,
+                         detail: %{}
   end
 
   def init_upload(conn, %{"name" => name,"mount" => _mount } = _params) do
