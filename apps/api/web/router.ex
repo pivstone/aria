@@ -1,6 +1,8 @@
 defmodule Api.Router do
   use Api.Web, :router
 
+  use Plug.ErrorHandler
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -26,4 +28,17 @@ defmodule Api.Router do
     patch  "/*name",    DockerRouter,   :patch
   end
 
+  def handle_errors(conn, %{kind: :error, reason: %Api.DockerError{} = exception, stack: _stack}) do
+    reason = %{"errors" => [%{"code" => exception.code,
+                             "message"=> exception.message,
+                             "detail" => exception.detail}]}
+    body = Poison.encode! reason
+    conn
+    |> put_req_header("content_type", "application/json")
+    |> send_resp(conn.status,body)
+  end
+
+  def handle_errors(conn, assigns) do
+    send_resp(conn, conn.status, "Something went wrong")
+  end
 end

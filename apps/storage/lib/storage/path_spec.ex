@@ -43,7 +43,6 @@ defmodule Storage.PathSepc do
 	      -> _blob/<algorithm>
 	          <split directory content addressable storage>
 	"""
-
 	def data_dir do
 	  Application.get_env(:storage,__MODULE__)[:data_dir]
 	end
@@ -55,7 +54,7 @@ defmodule Storage.PathSepc do
 	:return:
 	"""
 	def get_upload_info_path(name, uuid) do
-    "#{data_dir}/#{name}/_uploads/#{uuid}/info"
+    "#{data_dir()}/#{name}/_uploads/#{uuid}/info"
   end
 
 	@doc """
@@ -65,7 +64,7 @@ defmodule Storage.PathSepc do
 	:return:
 	"""
 	def get_upload_path(name, uuid) do
-		"#{data_dir}/#{name}/_uploads/#{uuid}/data"
+		"#{data_dir()}/#{name}/_uploads/#{uuid}/data"
 	end
 
 	@doc """
@@ -76,11 +75,11 @@ defmodule Storage.PathSepc do
 	"""
   def get_blob_path(name,digest) do
 		[hash_method, digest_value] = digest |> String.split(":",parts: 2)
-		"#{data_dir}/#{name}/_blob/#{hash_method}/#{digest_value |> String.slice(0..1)}/#{digest_value}/data"
+		"#{data_dir()}/#{name}/_blob/#{hash_method}/#{digest_value |> String.slice(0..1)}/#{digest_value}/data"
   end
 
   def get_tags_path(name) do
-    "#{data_dir}/#{name}/_manifests/tags"
+    "#{data_dir()}/#{name}/_manifests/tags"
   end
 
   @doc """
@@ -90,21 +89,21 @@ defmodule Storage.PathSepc do
 	:return:
 	"""
 	def get_tag_path(name, tag_name) do
-    "#{data_dir}/#{name}/_manifests/tags/#{tag_name}"
+    "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}"
 	end
 
   def get_tag_current_path(name, tag_name) do
-    "#{data_dir}/#{name}/_manifests/tags/#{tag_name}/current"
+    "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}/current"
   end
 
   def get_tag_index_path(name, tag_name, digest) do
     [hash_method, hash_value] = digest |> String.split(":",parts: 2)
-    "#{data_dir}/#{name}/_manifests/tags/#{tag_name}/index/#{hash_method}/#{hash_value}"
+    "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}/index/#{hash_method}/#{hash_value}"
   end
 
   def get_reference_path(name, digest) do
     [hash_method, hash_value] = digest |> String.split(":",parts: 2)
-    "#{data_dir}/#{name}/_manifests/revisions/#{hash_method}/#{hash_value}"
+    "#{data_dir()}/#{name}/_manifests/revisions/#{hash_method}/#{hash_value}"
   end
 
 	@doc """
@@ -114,6 +113,6 @@ defmodule Storage.PathSepc do
 	"""
 	def get_layer_path( name, digest) do
 	  [hash_method, hash_value] = digest |> String.split(":",parts: 2)
-	  "#{data_dir}/#{name}/_layers/#{hash_method}/#{hash_value}"
+	  "#{data_dir()}/#{name}/_layers/#{hash_method}/#{hash_value}"
 	end
 end

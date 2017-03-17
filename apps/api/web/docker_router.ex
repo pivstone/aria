@@ -92,7 +92,7 @@ defmodule Api.DockerRouter do
         conn
         |> merge_params(params)
         |> Api.ManifestController.call(Api.ManifestController.init(:put))
-      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
+      (params = Regex.named_captures(@blob_post_url, conn.request_path)) != nil ->
         conn
         |> merge_params(params)
         |> Api.BlobController.call(Api.BlobController.init(:put))

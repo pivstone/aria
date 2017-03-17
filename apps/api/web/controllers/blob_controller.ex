@@ -1,5 +1,6 @@
 defmodule Api.BlobController do
 	use Api.Web, :controller
+  require Logger
 
   @doc """
   获取 Blob 对象
@@ -18,12 +19,16 @@ defmodule Api.BlobController do
     [hash_method, value] = digest |> String.split(":", parts: 2)
     file_digest = Storage.driver().get_blob_digest(name, uuid, hash_method)
     if value != file_digest do
-      raise BlobDigestInvalidException
+      Logger.warn("Blob upload digest didnt match #{file_digest} != #{value}")
+      raise Api.DockerError,message: "digest did not match uploaded content",
+                            code: "BLOB_UPLOAD_INVALID",
+                            plug_status: 400,
+                            detail: %{}
     end
     Storage.driver().commit(name, uuid, digest)
     conn
-      |> put_req_header("location", conn.request_path <> upload_id)
-      |> put_req_header("docker-upload-uuid",upload_id)
+      |> put_req_header("location", conn.request_path)
+      |> put_req_header("docker-upload-uuid",uuid)
       |> send_resp(204, "")
   end
   @doc """
@@ -39,8 +44,13 @@ defmodule Api.BlobController do
     end
   end
 
-  def patch(conn, _params) do
-    render conn, "index.json",tag: []
+  def patch(conn, %{"name" => name,  "uuid" => uuid} =_params) do
+    length = Storage.driver().save_full_upload(conn._upload, name, uuid)
+    conn
+      |> put_req_header("location", conn.request_path <> uuid)
+      |> put_req_header("docker-upload-uuid",uuid)
+      |> put_req_header("range","0-#{length}")
+      |> send_resp(202, "")
   end
 
   def post(conn, _params) do
