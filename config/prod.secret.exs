@@ -2,5 +2,5 @@ use Mix.Config
 
 
 
-config :storage, Storage.PathSepc,
+config :storage, Storage.PathSpec,
 	data_dir: "/tmp"

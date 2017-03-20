@@ -32,4 +32,8 @@ defmodule Storage.Driver do
   存储上传文件
   """
   @callback save_full_upload(path :: String.t, image_name, uuid) :: number
+  @doc """
+  获取 Repo 所有的 tags
+  """
+  @callback get_tags(image_name) :: [String.t]
 end

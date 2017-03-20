@@ -14,7 +14,7 @@ defmodule Api.ImageView do
     %{name: image.name}
   end
 
-  def render("tag.json", %{tag: tag}) do
-    %{name: tag.name}
+  def render("tag.json", %{image: name}) do
+    name
   end
 end

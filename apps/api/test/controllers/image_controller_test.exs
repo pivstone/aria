@@ -9,7 +9,7 @@ defmodule Api.ImageControllerTest do
   test "GET image tag list url resolve", %{conn: conn} do
     name = "test/test"
     conn = get conn, "/v2/#{name}/tags/list"
-    assert json_response(conn, 200) == %{"name" => name, "tags" => []}
+    assert json_response(conn, 200) == %{"name" => name, "tags" => [ "latest"]}
   end
 
   test "GET image tag list use invalid url resolve", %{conn: conn} do

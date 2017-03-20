@@ -19,6 +19,7 @@ defmodule Api.ImageController do
   end
 
   def get(conn, %{"name" => name}) do
-    render conn, "tag_list.json",%{ tag: [],name: name}
+    tags = Storage.driver().get_tags(name)
+    render conn, "tag_list.json",%{ tag: tags,name: name}
   end
 end

@@ -1,4 +1,4 @@
-defmodule Storage.PathSepc do
+defmodule Storage.PathSpec do
 	@moduledoc """
    Docker Registry 的文件存储结构
    ref:[https://github.com/docker/distribution/blob/641f1029677e49faa277f7769797518e973865fd/registry/storage/paths.go#L24]

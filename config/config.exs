@@ -17,7 +17,7 @@ import_config "../apps/*/config/config.exs"
 #       metadata: [:user_id]
 
 
-config :storage, Storage.PathSepc,
+config :storage, Storage.PathSpec,
 	data_dir: "/tmp"
 
 config :storage, Storage,

@@ -50,7 +50,7 @@ defmodule Api.BlobControllerTest do
     name = "test/test"
     uuid = "1234-123140123-1234-0000"
     conn = put_req_header(conn,"content-type", "application/octet-stream")
-    |> patch("/v2/#{name}/blobs/uploads/#{uuid}","test")
+    |> patch("/v2/#{name}/blobs/uploads/#{uuid}","test123")
     assert response(conn, 202)
   end
 

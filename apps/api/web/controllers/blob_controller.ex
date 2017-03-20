@@ -6,7 +6,7 @@ defmodule Api.BlobController do
   获取 Blob 对象
   """
   def get(conn, %{"name" => name, "digest" => digest} = _params) do
-    blob_path = Storage.PathSepc.get_blob_path(name, digest)
+    blob_path = Storage.PathSpec.get_blob_path(name, digest)
     send_file(conn, :ok, blob_path)
   end
 
@@ -35,7 +35,7 @@ defmodule Api.BlobController do
   """
 
   def head(conn, %{"name" => name,"digest" => digest} = _params) do
-    blob_path = Storage.PathSepc.get_blob_path(name,digest)
+    blob_path = Storage.PathSpec.get_blob_path(name,digest)
     if File.exists?(blob_path) do
       send_resp(conn, :ok, "")
     else
@@ -52,8 +52,11 @@ defmodule Api.BlobController do
       |> send_resp(202, "")
   end
 
-  def post(conn, _params) do
-    render conn, "index.json",tag: []
+  def post(conn, %{"uuid" => uuid} = _params) do
+    conn
+      |> put_req_header("location", conn.request_path)
+      |> put_req_header("docker-upload-uuid",uuid)
+      |> send_resp(204, "")
   end
 
   @doc """

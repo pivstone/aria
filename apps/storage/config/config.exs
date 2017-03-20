@@ -32,5 +32,5 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 
-config :storage, Storage.PathSepc,
+config :storage, Storage.PathSpec,
 	data_dir: "/tmp"
