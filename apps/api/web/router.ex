@@ -19,8 +19,7 @@ defmodule Api.Router do
 
   scope "/v2", Api do
     pipe_through :api
-
-    get    "/",         PageController, :index
+    get    "/",         ImageController,:index
     get    "/_catalog", ImageController,:catalog
     get    "/*name",    DockerRouter,   :get
     post   "/*name",    DockerRouter,   :post
@@ -29,7 +28,7 @@ defmodule Api.Router do
     patch  "/*name",    DockerRouter,   :patch
   end
 
-  def handle_errors(conn, %{kind: :error, reason: %Api.DockerError{} = exception, stack: _stack}) do
+  def handle_errors(conn, %{reason: %Api.DockerError{} = exception}) do
     reason = %{"errors" => [%{"code" => exception.code,
                              "message"=> exception.message,
                              "detail" => exception.detail}]}
@@ -39,7 +38,13 @@ defmodule Api.Router do
     |> send_resp(conn.status,body)
   end
 
-  def handle_errors(conn, _assigns) do
+  def handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{} = exception}=_assigns) do
+    send_resp(conn, conn.status, "Not Found")
+  end
+
+  def handle_errors(conn, assigns) do
+    Logger.warn inspect "uncatch exception #{assigns}"
     send_resp(conn, conn.status, "Something went wrong")
   end
+
 end
