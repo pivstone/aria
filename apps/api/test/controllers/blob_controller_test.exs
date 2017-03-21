@@ -14,8 +14,10 @@ defmodule Api.BlobControllerTest do
   test "DELETE blob  url resolve", %{conn: conn} do
     name = "test/test"
     digest = "sha256:046e44ee6057f1264d00b0c54adcff2f2c44d30a29b50dfef928776f7aa45cc8"
-    conn = delete conn, "/v2/#{name}/blobs/#{digest}"
-    assert json_response(conn, 200) == %{}
+    assert_raise Api.DockerError,fn ->
+      conn = delete conn, "/v2/#{name}/blobs/#{digest}"
+      response(conn, 405)
+    end
   end
 
   test "POST blob uploads url resolve", %{conn: conn} do
@@ -95,7 +97,4 @@ defmodule Api.BlobControllerTest do
     conn = patch conn, "/v2/#{name}/blobs/#{uuid}"
     assert response(conn, 404)
   end
-
-
-
 end

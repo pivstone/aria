@@ -1,6 +1,10 @@
 defmodule Api.ImageView do
   use Api.Web, :view
 
+  def render("index.json",%{}) do
+    %{}
+  end
+
   def render("catalog.json", %{images: images}) do
     %{repositories: render_many(images, Api.ImageView, "image.json")}
   end
