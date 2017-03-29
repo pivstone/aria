@@ -82,4 +82,10 @@ defmodule Storage do
 	  blob_path = Storage.PathSpec.get_blob_path(name,digest)
     driver().stream(blob_path)
 	end
+
+
+	def get_blob(name, digest) do
+	  blob_path = Storage.PathSpec.get_blob_path(name,digest)
+    driver().read(blob_path)
+	end
 end

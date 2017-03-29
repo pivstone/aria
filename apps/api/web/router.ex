@@ -1,7 +1,7 @@
 defmodule Api.Router do
   use Api.Web, :router
-
   use Plug.ErrorHandler
+  require Logger
 
   pipeline :browser do
     plug :accepts, ["html"]
