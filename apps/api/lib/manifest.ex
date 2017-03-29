@@ -14,22 +14,18 @@ defmodule Manifest do
       def encode(%{schemaVersion: schemaVersion, name: name, tag: tag,architecture: architecture, fsLayers: fsLayers, history: history}, options) do
         """
         {
-            "schemaVersion:#{schemaVersion},
-            "name":#{name}",
-            "tag":#{tag},
-            "architecture":#{architecture},
-            "fsLayers":#{Poison.Encoder.encode(fsLayers, [pretty: true,intent: 4,offset: 4])},
-            "history":#{Poison.Encoder.encode(history, [pretty: true,intent: 4,offset: 4])}
+           "schemaVersion:#{schemaVersion},
+           "name":#{name}",
+           "tag":#{tag},
+           "architecture":#{architecture},
+           "fsLayers":#{Poison.Encoder.encode(fsLayers, [pretty: true,intent: 4,offset: 4])},
+           "history":#{Poison.Encoder.encode(history, [pretty: true,intent: 4,offset: 4])}
         }
         """
       end
     end
   end
-  defmodule History do
-    defstruct [:v1Compatibility]
-  end
 
-  alias Manifest
 
 	@empty_blob_digest "sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
   def transform_v2_to_v1(manifest,name,reference) do
@@ -80,7 +76,7 @@ defmodule Manifest do
               end
           end
         parent_id = v1_id
-        history = [%History{v1Compatibility: v1_layers}|Map.fetch!(data,:history)]
+        history = [%{:v1Compatibility => v1_layers}|Map.fetch!(data,:history)]
         data = Map.put(data, :history, history)
         data
       end)
