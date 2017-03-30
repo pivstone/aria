@@ -1,7 +1,6 @@
 defmodule Api.BlobControllerTest do
   use Api.ConnCase
 
-
   test "PUT blob upload url resolve", %{conn: conn} do
     name = "test/test"
     uuid = "1234-123140123-1234-1231"
