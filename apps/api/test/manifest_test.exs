@@ -7,4 +7,9 @@ defmodule ManifestTest do
     result = Manifest.transform_v2_to_v1(manifestV2 ,"registry","latest")|> Poison.encode!(pretty: true)
     :ok = File.write("test/data/schemaV2_.json",result)
 	end
+
+	test "verfiy manifest v1" do
+	  manifestV1 = File.read!("test/data/schemaV1.json")
+	  Manifest.verify(manifestV1)
+	end
 end

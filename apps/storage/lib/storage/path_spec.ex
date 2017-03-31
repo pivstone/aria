@@ -97,7 +97,7 @@ defmodule Storage.PathSpec do
   end
 
   def get_tag_index_path(name, tag_name, digest) do
-    [hash_method, hash_value] = digest |> String.split(":",parts: 2)
+    [hash_method, hash_value] = digest |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}/index/#{hash_method}/#{hash_value}"
   end
 

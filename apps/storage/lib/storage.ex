@@ -22,8 +22,8 @@ defmodule Storage do
 
   def commit(name,uuid,digest) do
     file_name = Storage.PathSpec.get_upload_path(name, uuid)
-    target_name = Storage.PathSpec.get_blob_path(name,digest)
-    driver().move(file_name,target_name)
+    target_name = Storage.PathSpec.get_blob_path(name, digest)
+    driver().move(file_name, target_name)
   end
 
   @doc """
@@ -53,17 +53,18 @@ defmodule Storage do
   创建上传的文件时候的 Blob 文件
   """
 	def create_blob(_name) do
-    :crypto.strong_rand_bytes(16)|> Base.encode16
+    16
+    |> :crypto.strong_rand_bytes
+    |> Base.encode16
 	end
 
   def get_repositories(keyword,count \\ 10) do
     prefix = Storage.PathSpec.data_dir()
     len = prefix |> String.length
-    driver().list("#{prefix}/**/_uploads",[keyword])
+    "#{prefix}/**/_uploads"
+    |> driver().list([keyword])
     |> Enum.slice(1..count)
-    |> Enum.reduce([],fn(x,acc) ->
-      [x |> String.slice(len ..-8) |acc]
-    end)
+    |> Enum.reduce([],fn(x,acc) -> [x |> String.slice(len ..-8) |acc] end)
   end
 
 	@doc """
@@ -72,10 +73,9 @@ defmodule Storage do
 	def get_tags(name) do
 		tag_path = Storage.PathSpec.get_tags_path(name)
     len = 1 + String.length(tag_path)
-    driver().list("#{tag_path}/*")
-    |> Enum.reduce([],fn(x,acc) ->
-      [x |> String.slice(len..-1) |acc]
-    end)
+    "#{tag_path}/*"
+    |> driver().list()
+    |> Enum.reduce([],fn(x,acc) -> [x |> String.slice(len..-1) |acc] end)
 	end
 
 	def blob_stream(name, digest) do

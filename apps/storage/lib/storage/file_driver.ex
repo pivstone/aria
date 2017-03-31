@@ -22,7 +22,8 @@ defmodule Storage.FileDriver do
 
   def digest(path) do
     check_file(path)
-    File.stream!(path,[],4096)
+    path
+    |> File.stream!([],4096)
     |> Enum.reduce(:crypto.hash_init(:sha256),fn(line, acc) -> :crypto.hash_update(acc,line) end )
     |> :crypto.hash_final
     |> Base.encode16

@@ -44,6 +44,7 @@ defschema Manifest.V1Schema,[
       :architecture,
       :fsLayers,
       :history,
+      :signatures,
       ]
 
 defschema Manifest.V1Compatibility,[
