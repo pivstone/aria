@@ -8,6 +8,7 @@ defmodule Storage.FileDriver do
 
 	def move(src,dist) do
     ensure_dir(dist)
+    File.rename(src, dist)
     with :ok <- File.rename(src, dist),
          :ok <- src|> Path.dirname |> File.rmdir!,
     do: :ok
@@ -16,7 +17,7 @@ defmodule Storage.FileDriver do
 	defp ensure_dir(file_name) do
     dir_name = Path.dirname(file_name)
     if not File.exists?(dir_name) do
-       File.mkdir_p(dir_name)
+       :ok = File.mkdir_p(dir_name)
     end
   end
 
@@ -50,10 +51,9 @@ defmodule Storage.FileDriver do
 
   def list(path,keyword),do: Path.wildcard(path,[keyword])
 
-
   def check_file(path) do
-    Logger.debug(path)
     if not File.exists?(path) do
+      Logger.debug(path)
       raise Storage.FileError,
         message: "blob unknown",
         code: "BLOB_UNKNOWN",

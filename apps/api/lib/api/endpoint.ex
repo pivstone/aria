@@ -21,14 +21,14 @@ defmodule Api.Endpoint do
 
   plug Plug.RequestId
   plug Plug.Logger
-
+  plug Api.Plug.DefaultType
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json ,Api.Parsers.Chunked],
     pass: ["*/*"],
     json_decoder: Poison
 
   plug Plug.MethodOverride
-  plug Plug.Head
+  plug Api.Plug.Head
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

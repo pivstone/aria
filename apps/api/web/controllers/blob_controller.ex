@@ -3,16 +3,36 @@ defmodule Api.BlobController do
   require Logger
 
   @doc """
+  检查 Blob 对象是否存在
+  """
+  def get(conn, %{"name" => name, "digest" => digest,"head"=> true} = _params) do
+    if Storage.exists?(name,digest) do
+      content_len = Storage.get_blob_size(name,digest)
+      conn
+      |> put_resp_header("content-length",~s(#{content_len}))
+      |> send_resp(:ok, "")
+    else
+      Logger.warn(inspect "#{name},#{digest} not found")
+      send_resp(conn, :not_found, "")
+    end
+  end
+
+  @doc """
   获取 Blob 对象
   """
   def get(conn, %{"name" => name, "digest" => digest} = _params) do
     if Storage.exists?(name,digest) do
+      content_len = Storage.get_blob_size(name,digest)
+      conn = put_resp_header(conn,"Content-Length","10")
+      conn = put_resp_header(conn,"docker-content-digest","sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
       conn = send_chunked(conn, 200)
       Enum.into(Storage.blob_stream(name,digest),conn)
     else
       send_resp(conn, :not_found, "")
     end
   end
+
+
 
 
   @doc """
@@ -32,35 +52,26 @@ defmodule Api.BlobController do
     end
     Storage.commit(name, uuid, digest)
     conn
-      |> put_req_header("location", conn.request_path)
-      |> put_req_header("docker-upload-uuid",uuid)
+      |> put_resp_header("location", conn.request_path<>"?"<>conn.query_string)
+      |> put_resp_header("docker-upload-uuid",uuid)
       |> send_resp(204, "")
   end
-  @doc """
-  检查 Blob 对象是否存在
-  """
 
-  def head(conn, %{"name" => name,"digest" => digest} = _params) do
-    if Storage.exists?(name,digest) do
-      send_resp(conn, :ok, "")
-    else
-      send_resp(conn, :not_found, "")
-    end
-  end
+
 
   def patch(conn, %{"name" => name,  "uuid" => uuid, "_upload" => path} =_params) do
     len = Storage.save_full_upload(path, name, uuid)
     conn
-      |> put_req_header("location", conn.request_path <> uuid)
-      |> put_req_header("docker-upload-uuid",uuid)
-      |> put_req_header("range","0-#{len}")
+      |> put_resp_header("location", conn.request_path)
+      |> put_resp_header("docker-upload-uuid",uuid)
+      |> put_resp_header("range","0-#{len}")
       |> send_resp(202, "")
   end
 
   def post(conn, %{"uuid" => uuid} = _params) do
     conn
-      |> put_req_header("location", conn.request_path)
-      |> put_req_header("docker-upload-uuid",uuid)
+      |> put_resp_header("location", conn.request_path)
+      |> put_resp_header("docker-upload-uuid",uuid)
       |> send_resp(204, "")
   end
 
@@ -82,9 +93,9 @@ defmodule Api.BlobController do
   def init_upload(conn, %{"name" => name,"mount" => _mount } = _params) do
     upload_id = Storage.create_blob(name)
     conn
-    |> put_req_header("location", conn.request_path <> upload_id)
-    |> put_req_header("docker-upload-uuid",upload_id)
-    |> put_req_header("range","0-0")
+    |> put_resp_header("location", conn.request_path <> upload_id)
+    |> put_resp_header("docker-upload-uuid",upload_id)
+    |> put_resp_header("range","0-0")
     |> send_resp(201, "")
   end
 

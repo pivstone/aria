@@ -12,10 +12,7 @@ defmodule Api.Router do
   end
 
   pipeline :api do
-    plug Api.Plug.DefaultType
     plug :accepts, ["octet-stream","json"]
-    plug Plug.Parsers, parsers: [Api.Parsers.Chunked,:urlencoded, :json]
-    plug Plug.Head
   end
 
   scope "/v2", Api do

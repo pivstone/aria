@@ -40,8 +40,8 @@ defmodule Api.BlobControllerTest do
   end
 
   test "HEAD blob  url resolve", %{conn: conn} do
-    name = "test/test"
-    digest = "sha256:046e44ee6057f1264d00b0c54adcff2f2c44d30a29b50dfef928776f7aa45cc8"
+    name = "registry"
+    digest = "sha256:45821069964735bb004b36cd03f95b0e56cbfc91db1e3b821d0d9b7c57f8b3cd"
     conn = head conn, "/v2/#{name}/blobs/#{digest}"
     assert response(conn, 200)
   end
@@ -55,10 +55,19 @@ defmodule Api.BlobControllerTest do
     assert response(conn, 202)
   end
 
+  test "PATCH blob  url II", %{conn: conn} do
+    name = "test/test"
+    uuid = "a234-123140123-1234-0000"
+    conn = put_req_header(conn,"content-type", "application/octet-stream")
+    |> patch("/v2/#{name}/blobs/uploads/#{uuid}","test123")
+    assert response(conn, 202)
+  end
+
   test "PATCH blob  url resolve resolve without content-type", %{conn: conn} do
     name = "test/test"
     uuid = "1234-123140123-1234-0000"
     conn = put_req_header(conn,"content-type", "")
+    |> put_req_header("transfer-encoding", "chunked")
     |> patch("/v2/#{name}/blobs/uploads/#{uuid}","test123")
     assert response(conn, 202)
   end

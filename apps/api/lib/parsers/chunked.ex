@@ -9,7 +9,6 @@ defmodule Api.Parsers.Chunked do
 
 
 	def parse(conn, "application", "octet-stream", _headers, _opts) do
-		IO.puts conn
 		file = make_random_file_path()
 		conn
       |> read_body

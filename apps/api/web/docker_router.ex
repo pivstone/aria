@@ -56,23 +56,6 @@ defmodule Api.DockerRouter do
     end
   end
 
-  def call(%Plug.Conn{} = conn, :head) do
-    cond do
-      (params = Regex.named_captures(@manifest_url, conn.request_path)) != nil ->
-        conn
-        |> merge_params(params)
-        |> Api.ManifestController.call(Api.ManifestController.init(:head))
-      (params = Regex.named_captures(@blob_url, conn.request_path)) != nil ->
-        conn
-        |> merge_params(params)
-        |> Api.BlobController.call(Api.BlobController.init(:head))
-      true ->
-        conn
-        |> send_resp(404,"not_found")
-        |> halt
-    end
-  end
-
   def call(%Plug.Conn{} = conn, :patch) do
     cond do
       (params = Regex.named_captures(@blob_post_url, conn.request_path)) != nil ->

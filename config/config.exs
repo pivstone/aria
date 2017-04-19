@@ -18,7 +18,7 @@ import_config "../apps/*/config/config.exs"
 
 
 config :storage, Storage.PathSpec,
-	data_dir: "/tmp"
+	data_dir: System.cwd <>"/data"
 
 config :storage, Storage,
 	driver: Storage.FileDriver

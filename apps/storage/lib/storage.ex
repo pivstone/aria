@@ -30,6 +30,7 @@ defmodule Storage do
   """
   def save_full_upload(tmp_path, name, uuid) do
     file_name = Storage.PathSpec.get_upload_path(name, uuid)
+    IO.puts file_name
     driver().move(tmp_path, file_name)
     driver().size(file_name)
   end
@@ -47,7 +48,10 @@ defmodule Storage do
      driver().read(manifest_path)
   end
 
-
+  def get_blob_size(name, digest) do
+    blob_path = Storage.PathSpec.get_blob_path(name,digest)
+    driver().size(blob_path)
+  end
   @doc """
   创建上传的文件时候的 Blob 文件
   """
