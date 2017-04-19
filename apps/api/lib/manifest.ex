@@ -5,9 +5,10 @@ defmodule Manifest do
 	"""
 	@empty_blob_digest "sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4"
   @history_fields ["author", "comment", "throwaway"]
-  @jwk JOSE.JWK.generate_key({:ec, "P-256"})
-  @jwa %{ "alg" => "ES256" }
-  @jwk_map @jwk |> JOSE.JWK.to_map|> elem(1)
+  @default_alg "ES256"
+  @named_curve :secp256r1
+  @jwa %{ "alg" => @default_alg}
+
 	@doc """
   将 v2_v2 版本的 Manifest 转化成 v2_v1 版本
   """
@@ -27,8 +28,6 @@ defmodule Manifest do
     {last,layers} = List.pop_at(config_data.history, -1)
     {data, _, parent_id} =
       Enum.reduce(layers,{data,-1,""}, fn layer,{data,layer_count,parent_id} ->
-        # 计算 blobSum
-        h = :crypto.hash_init(:sha256)
         {"sha256:"<>blob_sum,layer_count} =
           if layer.empty_layer == true do
             {@empty_blob_digest,layer_count}
@@ -42,8 +41,13 @@ defmodule Manifest do
         fs_layers = [%Manifest.FsLayers{blobSum: blob_sum}| data.fsLayers]
         data = %{data | fsLayers: fs_layers}
         # 构建 v1Compatibility 内容
-        h = :crypto.hash_update(h,blob_sum <> " " <> parent_id)
-        v1_id = :crypto.hash_final(h) |> Base.encode16 |> String.downcase
+        # 计算 blobSum
+        v1_id = :sha256
+          |> :crypto.hash_init()
+          |> :crypto.hash_update(blob_sum <> " " <> parent_id)
+          |> :crypto.hash_final
+          |> Base.encode16
+          |> String.downcase
         v1_layers = %Manifest.V1Compatibility{id: v1_id, created: layer.created, container_config: layer.created_by}
         v1_layers = parent_id != "" && %{v1_layers| parent: parent_id} || v1_layers
         v1_layers =
@@ -78,11 +82,25 @@ defmodule Manifest do
   Manifest V2 v1 的签名
   """
   def sign(manifest) do
-    {_, signed} = JOSE.JWS.sign(@jwk, Poison.encode!(manifest,pretty: true), @jwa)
-    signed = signed
-    |> Map.merge(%{header: %{jwk: @jwk_map} |> Map.merge(@jwa)})
-    |> Map.delete("payload")
-    %{manifest| signatures: [signed]}
+    {<<4,x::binary-size(32),y::binary-size(32)>> ,priv} = :crypto.generate_key(:ecdh,:secp256r1)
+    payload  = Poison.encode!(manifest,pretty: true)
+    formatlength = String.length(payload)-2
+    tail = String.slice(payload,formatlength..-1)|> Base.url_encode64
+    time = "2017-04-01T03:31:04Z"
+    protected = @jwa
+    |> Map.merge(%{"formatLength" => formatlength ,"formatTail" => tail,"time"=>time})
+    |> Poison.encode!
+    |> Base.url_encode64(padding: false)
+
+    payload_encode = payload
+    |> Base.url_encode64(padding: false)
+
+    signed_encode  = :ecdsa
+      |>:crypto.sign(:sha256,protected<>"."<>payload_encode,[priv,@named_curve])
+      |> :sign.decode
+      |> Base.url_encode64(padding: false)
+    jwk_map = %{"x"=>x|>Base.url_encode64(padding: false),"y" => y|>Base.url_encode64(padding: false),"kty"=> "EC","crv"=> "P-256","kid"=> "5BMU:PCVF:5Z3G:LQKI:TJRU:XMVZ:PEDH:AMUS:YIPH:B5QV:XUEA:M6AO"}
+    %{manifest| signatures: [%{"signature"=> signed_encode,"protected" => protected, "payload" => payload_encode,"header"=>%{"jwk" => jwk_map,"alg"=>"ES256"}}]}
   end
 
   @doc """
@@ -93,33 +111,38 @@ defmodule Manifest do
     signatures = manifest.signatures
     for signature <- signatures do
       header = Map.fetch!(signature,"header")
-      protected_header =  Map.fetch!(signature,"protected")
-      sign = Map.fetch!(signature,"signature")
+      protected =  signature
+      |> Map.fetch!("protected")
+      protected_header = protected
+      |> Base.url_decode64!(padding: false)
+      |> Poison.decode!
       payload = get_payload(protected_header,plaintext)
-      IO.puts payload
-      vk = get_verify_key(header)
-      #vk.verify(_decode(sign), payload)
+      jwk = get_verify_key(header)
+      verify(jwk,%{"payload"=>payload,"signature"=>Map.fetch!(signature,"signature"),"protected"=>protected})
     end
   end
 
-  defp get_payload(protected_header,plaintext) do
-    IO.puts protected_header |> Base.decode64!(case: :lower)
-    protected_data = protected_header
-      |> Base.decode16!
-      |> to_string
-      |> Poison.decode!
+  defp get_payload(protected_data,plaintext) do
     format_len = Map.fetch!(protected_data,"formatLength")
     tail = protected_data
       |> Map.fetch!("formatTail")
-      |> Base.decode64!
-    String.slice(plaintext,0..format_len) <> tail
+      |> Base.url_decode64!(padding: false)
+    String.slice(plaintext,0..format_len-1) <> tail
+    |> Base.url_encode64(padding: false)
   end
 
   defp get_verify_key(header) do
-    jwk = header
-      |> Map.fetch!("jwk")
-      |> JOSE.JWK.from
-      |> elem(1)
+    x = get_in(header,["jwk","x"])
+    y = get_in(header,["jwk","y"])
+    <<4>><>Base.url_decode64!(x,padding: false) <> Base.url_decode64!(y,padding: false)
   end
-  
+
+
+  defp verify(key,%{"payload"=>payload,"signature"=>encoded_signature,"protected"=>protected}) do
+    sig = encoded_signature
+      |>  Base.url_decode64!(padding: false)
+      |> :sign.encode
+    msg = protected<>"."<>payload
+  	:crypto.verify(:ecdsa,:sha256,msg,sig,[key,@named_curve])
+  end
 end
