@@ -7,21 +7,21 @@ defmodule Api.Plug.DefaultType do
 
   @behaviour Plug
   @methods ~w(POST PUT PATCH DELETE)
+  @empty_type {"content-type",""}
   alias Plug.Conn
 
   def init([]), do: []
 
-  def call(%{req_headers: [{"content-type",""},rest]= _req_headers, method: method} = conn, [])
-    when method  in @methods  do
+  def call(%{method: method,req_headers: req_headers} = conn, []) when method  in @methods do
+    @empty_type in req_headers &&  _call(conn) || conn
+  end
+
+  def call(conn, []), do: conn
+
+  defp _call(%{req_headers: req_headers} = conn) do
+    rest = List.delete(req_headers,@empty_type)
     new_req_headers = [{"content-type","application/octet-stream"}|rest]
     %{conn | req_headers: new_req_headers }
   end
 
-  def call(%{req_headers: req_headers, method: method} = conn, [])
-    when method  in @methods  do
-    new_req_headers = [{"content-type","application/octet-stream"}|req_headers]
-    %{conn | req_headers: new_req_headers }
-  end
-
-  def call(conn, []), do: conn
 end

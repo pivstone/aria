@@ -16,7 +16,7 @@ defmodule Storage.FileDriver do
 	defp ensure_dir(file_name) do
     dir_name = Path.dirname(file_name)
     if not File.exists?(dir_name) do
-       :ok =  File.mkdir(dir_name)
+       File.mkdir_p(dir_name)
     end
   end
 
