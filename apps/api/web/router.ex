@@ -43,7 +43,7 @@ defmodule Api.Router do
   end
 
   def handle_errors(conn, assigns) do
-    Logger.warn inspect "uncatch exception #{assigns}"
+    Logger.warn(inspect assigns)
     send_resp(conn, conn.status, "Something went wrong")
   end
 

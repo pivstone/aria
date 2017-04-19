@@ -21,6 +21,6 @@ defmodule Storage.Driver do
 
   @callback list(path, keyword :: String.t) :: [String.t]
 
-  @callback exist?(path) :: true | false
+  @callback exists?(path) :: true | false
 
 end

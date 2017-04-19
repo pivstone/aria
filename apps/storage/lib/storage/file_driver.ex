@@ -16,7 +16,7 @@ defmodule Storage.FileDriver do
 	defp ensure_dir(file_name) do
     dir_name = Path.dirname(file_name)
     if not File.exists?(dir_name) do
-        File.mkdir_p(dir_name)
+       :ok =  File.mkdir(dir_name)
     end
   end
 
@@ -40,7 +40,7 @@ defmodule Storage.FileDriver do
     check_file(path)
     File.read!(path)
   end
-  def exist?(path), do: File.exists?(path)
+  def exists?(path), do: File.exists?(path)
 
   def stream(path) do
     check_file(path)
@@ -52,6 +52,7 @@ defmodule Storage.FileDriver do
 
 
   def check_file(path) do
+    Logger.debug(path)
     if not File.exists?(path) do
       raise Storage.FileError,
         message: "blob unknown",

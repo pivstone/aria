@@ -6,9 +6,14 @@ defmodule Api.BlobController do
   获取 Blob 对象
   """
   def get(conn, %{"name" => name, "digest" => digest} = _params) do
-    conn = send_chunked(conn, 200)
-    Enum.into(Storage.blob_stream(name,digest),conn)
+    if Storage.exists?(name,digest) do
+      conn = send_chunked(conn, 200)
+      Enum.into(Storage.blob_stream(name,digest),conn)
+    else
+      send_resp(conn, :not_found, "")
+    end
   end
+
 
   @doc """
   完成 Blob 上传流程。并进行必要的检查
@@ -36,8 +41,7 @@ defmodule Api.BlobController do
   """
 
   def head(conn, %{"name" => name,"digest" => digest} = _params) do
-    blob_path = Storage.PathSpec.get_blob_path(name,digest)
-    if File.exists?(blob_path) do
+    if Storage.exists?(name,digest) do
       send_resp(conn, :ok, "")
     else
       send_resp(conn, :not_found, "")

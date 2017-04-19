@@ -7,7 +7,6 @@ defmodule Storage do
     Application.get_env(:storage, __MODULE__, [])[:driver]||@default_driver
   end
 
-
   @doc """
   获取 Blob 文件的 Digest 值
   """
@@ -55,7 +54,7 @@ defmodule Storage do
 	def create_blob(_name) do
     16
     |> :crypto.strong_rand_bytes
-    |> Base.encode16
+    |> Base.encode16(case: :lower)
 	end
 
   def get_repositories(keyword,count \\ 10) do
@@ -87,5 +86,11 @@ defmodule Storage do
 	def get_blob(name, digest) do
 	  blob_path = Storage.PathSpec.get_blob_path(name,digest)
     driver().read(blob_path)
+	end
+
+
+	def exists?(name,digest) do
+	  blob_path = Storage.PathSpec.get_blob_path(name,digest)
+    driver().exists?(blob_path)
 	end
 end
