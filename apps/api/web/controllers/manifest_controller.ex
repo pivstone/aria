@@ -46,8 +46,23 @@ defmodule Api.ManifestController do
   @doc """
   保存 Manifest
   """
-  def put(conn,params) do
-    render conn, "index.json",data: params
+  def put(conn,%{"name" => name, "digest" => digest, "tag" => tag, "data" => data} = params) do
+    [schema] = get_req_header(conn, "content-type")
+    if schema == nil  do
+      raise Storage.FileError,
+              message: "Manifest Invalid",
+              code: "MANIFEST_INVALID",
+              plug_status: 400
+    end
+    if not schema in [@scheme1, @scheme2] do
+      raise Storage.FileError,
+              message: "The operation is unsupported",
+              code: "UNSUPPORTED",
+              plug_status: 405
+    end
+    # TODO: check digest
+    Manifest.save(data, name, tag)
+    render conn, "index.json",data: %{"name"=>name,"reference"=>tag}
   end
 
   @doc """

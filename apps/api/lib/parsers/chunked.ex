@@ -16,7 +16,6 @@ defmodule Api.Parsers.Chunked do
 	end
 
 	def parse(conn, type, subtype, _headers, _opts) do
-		IO.puts subtype
     {:next, conn}
   end
 

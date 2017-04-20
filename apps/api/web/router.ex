@@ -13,6 +13,7 @@ defmodule Api.Router do
 
   pipeline :api do
     plug :accepts, ["octet-stream","json"]
+    plug Api.Plug.DockerHeader
   end
 
   scope "/v2", Api do

@@ -22,9 +22,6 @@ defmodule Api.BlobController do
   """
   def get(conn, %{"name" => name, "digest" => digest} = _params) do
     if Storage.exists?(name,digest) do
-      content_len = Storage.get_blob_size(name,digest)
-      conn = put_resp_header(conn,"Content-Length","10")
-      conn = put_resp_header(conn,"docker-content-digest","sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
       conn = send_chunked(conn, 200)
       Enum.into(Storage.blob_stream(name,digest),conn)
     else

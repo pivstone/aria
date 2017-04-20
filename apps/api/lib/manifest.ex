@@ -122,7 +122,7 @@ defmodule Manifest do
     end
   end
 
-  defp get_payload(protected_data,plaintext) do
+  defp get_payload(protected_data, plaintext) do
     format_len = Map.fetch!(protected_data,"formatLength")
     tail = protected_data
       |> Map.fetch!("formatTail")
@@ -138,11 +138,37 @@ defmodule Manifest do
   end
 
 
-  defp verify(key,%{"payload"=>payload,"signature"=>encoded_signature,"protected"=>protected}) do
+  defp verify(key, %{"payload" => payload, "signature" => encoded_signature, "protected" => protected}) do
     sig = encoded_signature
       |>  Base.url_decode64!(padding: false)
       |> :sign.encode
     msg = protected<>"."<>payload
   	:crypto.verify(:ecdsa,:sha256,msg,sig,[key,@named_curve])
+  end
+
+  def save(manifest, name, reference) do
+    manifest_digest = Storage.save_manifest(name,manifest)
+    current_tag_path = Storage.PathSpec.get_tag_current_path(name, reference)
+    Storage.link(manifest_digest, current_tag_path)
+    tag_index_path = Storage.PathSpec.get_tag_index_path(name, reference, manifest_digest)
+    Storage.link(manifest_digest, tag_index_path)
+
+    # Save reference
+    reference_path = Storage.PathSpec.get_reference_path(name, manifest_digest)
+    Storage.link(manifest_digest, reference_path)
+
+    for layer <- get_layers(manifest) do
+      layer_path = Storage.PathSpec.get_layer_path(name, layer)
+      Storage.link(layer, layer_path)
+    end
+  end
+
+
+  defp get_layers(manifest) do
+    data = Poison.decode!(manifest)
+    case Map.get(data,"schemaVersion") do
+      1 -> for layer <- Map.get(data,"fsLayers"),do: Map.get(layer,"blobSum")
+      2 -> for layer <- Map.get(data,"layers"),do: Map.get(layer,"digest")
+    end
   end
 end

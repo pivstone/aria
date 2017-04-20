@@ -73,7 +73,7 @@ defmodule Storage.PathSpec do
 	:param name: repository name
 	:return:
 	"""
-  def get_blob_path(name,digest) do
+  def get_blob_path(name, digest) do
 		[hash_method, digest_value] = digest |> String.split(":",parts: 2)
 		"#{data_dir()}/#{name}/_blob/#{hash_method}/#{digest_value |> String.slice(0..1)}/#{digest_value}/data"
   end
@@ -102,7 +102,7 @@ defmodule Storage.PathSpec do
   end
 
   def get_reference_path(name, digest) do
-    [hash_method, hash_value] = digest |> String.split(":",parts: 2)
+    [hash_method, hash_value] = digest |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/revisions/#{hash_method}/#{hash_value}"
   end
 
@@ -112,7 +112,7 @@ defmodule Storage.PathSpec do
 	:return:
 	"""
 	def get_layer_path( name, digest) do
-	  [hash_method, hash_value] = digest |> String.split(":",parts: 2)
+	  [hash_method, hash_value] = digest |> String.split(":", parts: 2)
 	  "#{data_dir()}/#{name}/_layers/#{hash_method}/#{hash_value}"
 	end
 end

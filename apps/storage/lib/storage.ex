@@ -97,4 +97,30 @@ defmodule Storage do
 	  blob_path = Storage.PathSpec.get_blob_path(name,digest)
     driver().exists?(blob_path)
 	end
+
+
+	def save_manifest(name,data)do
+	  hash = :sha256
+    digest = hash
+    |> :crypto.hash_init
+    |> :crypto.hash_update(data)
+    |> :crypto.hash_final
+    |> Base.encode16(case: :lower)
+
+    digest_name = ~s(#{hash}) <> ":" <> digest
+    target_name = Storage.PathSpec.get_blob_path(name,digest_name)
+    driver().save(target_name,data)
+    digest_name
+	end
+
+  @doc """
+  Link Blob 到指定目录
+  :param digest: sha256：XXX 格式的
+  :param target:
+  :return:
+  """
+  def link(digest, target) do
+    path = target <> "/link"
+    driver().save(path, digest)
+  end
 end

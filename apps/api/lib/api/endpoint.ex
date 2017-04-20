@@ -23,7 +23,7 @@ defmodule Api.Endpoint do
   plug Plug.Logger
   plug Api.Plug.DefaultType
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json ,Api.Parsers.Chunked],
+    parsers: [Api.Parsers.Chunked, Api.Parsers.Schema1, Api.Parsers.Schema2,:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Poison
 

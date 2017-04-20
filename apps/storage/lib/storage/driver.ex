@@ -10,6 +10,7 @@ defmodule Storage.Driver do
 
   @callback digest(path) :: String.t
 
+  @callback save(path, data :: binary) :: String.t
 
   @callback blob_size(path) :: non_neg_integer
 
