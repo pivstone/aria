@@ -11,9 +11,10 @@ defmodule Api.ManifestControllerTest do
 
   test "PUT manifests fetch url resolve", %{conn: conn} do
     name = "test/test"
-    ref = "1-dev"
-    conn = put conn, "/v2/#{name}/manifests/#{ref}"
-    assert json_response(conn, 200) == %{"name" => name, "digest" => "", "tag" => ref}
+    ref = "latest"
+    conn = put_req_header(conn,"content-type", "application/vnd.docker.distribution.manifest.v1+prettyjws")
+    conn = put conn, "/v2/#{name}/manifests/#{ref}",File.read!("test/data/schemaV1.json")
+    assert json_response(conn, 200) == %{"name" => name, "reference" => ref}
   end
 
   test "DELETE manifests fetch url resolve", %{conn: conn} do

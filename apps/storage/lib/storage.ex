@@ -30,7 +30,6 @@ defmodule Storage do
   """
   def save_full_upload(tmp_path, name, uuid) do
     file_name = Storage.PathSpec.get_upload_path(name, uuid)
-    IO.puts file_name
     driver().move(tmp_path, file_name)
     driver().size(file_name)
   end
@@ -56,7 +55,7 @@ defmodule Storage do
   创建上传的文件时候的 Blob 文件
   """
 	def create_blob(_name) do
-    16
+    32
     |> :crypto.strong_rand_bytes
     |> Base.encode16(case: :lower)
 	end

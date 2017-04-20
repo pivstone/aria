@@ -12,11 +12,10 @@ defmodule Api.Plug.DockerHeader do
   def init([]), do: []
 
   def call(conn, [])  do
-    IO.puts Application.get_env(:plug, :validate_header_keys_during_test)
 	  Conn.register_before_send(conn, fn conn ->
       digest = :sha256
         |> :crypto.hash_init
-        |> :crypto.hash_update(conn.resp_body)
+        |> :crypto.hash_update(conn.resp_body||"")
         |> :crypto.hash_final
         |> Base.encode16(case: :lower)
       conn
