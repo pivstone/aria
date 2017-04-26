@@ -12,7 +12,7 @@ defmodule Api.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["octet-stream","json"]
+    plug :accepts, ["octet-stream", "json", "manifest.v1-prettyjws", "manifest.v2-json", "manifest.v2.list-json"]
     plug Api.Plug.DockerHeader
   end
 
@@ -28,6 +28,17 @@ defmodule Api.Router do
   end
 
   def handle_errors(conn, %{reason: %Api.DockerError{} = exception}) do
+    reason = %{"errors" => [%{"code" => exception.code,
+                             "message"=> exception.message,
+                             "detail" => exception.detail}]}
+    body = Poison.encode! reason
+    conn
+    |> put_req_header("content_type", "application/json")
+    |> send_resp(conn.status,body)
+  end
+
+
+  def handle_errors(conn, %{reason: %Storage.FileError{} = exception}) do
     reason = %{"errors" => [%{"code" => exception.code,
                              "message"=> exception.message,
                              "detail" => exception.detail}]}

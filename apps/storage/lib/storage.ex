@@ -42,7 +42,11 @@ defmodule Storage do
 
   def get_manifest(name,  reference) do
      tag_current_path = Storage.PathSpec.get_tag_current_path(name, reference)
-     digest = driver().read(tag_current_path <> "/link")
+     link = tag_current_path <> "/link"
+     if not driver().exists?(link) do
+
+     end
+     digest = driver().read(link)
      manifest_path = Storage.PathSpec.get_blob_path(name,digest)
      driver().read(manifest_path)
   end
@@ -63,10 +67,10 @@ defmodule Storage do
   def get_repositories(keyword,count \\ 10) do
     prefix = Storage.PathSpec.data_dir()
     len = prefix |> String.length
+    len = len + 1
     "#{prefix}/**/_uploads"
     |> driver().list([keyword])
-    |> Enum.slice(1..count)
-    |> Enum.reduce([],fn(x,acc) -> [x |> String.slice(len ..-8) |acc] end)
+    |> Enum.reduce([],fn(x,acc) -> [x |> String.slice(len..-10) |acc] end)
   end
 
 	@doc """

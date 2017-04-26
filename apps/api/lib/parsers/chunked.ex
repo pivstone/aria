@@ -15,7 +15,7 @@ defmodule Api.Parsers.Chunked do
       |> save(file)
 	end
 
-	def parse(conn, type, subtype, _headers, _opts) do
+	def parse(conn, _type, _subtype, _headers, _opts) do
     {:next, conn}
   end
 

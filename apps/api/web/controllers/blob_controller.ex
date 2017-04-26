@@ -60,8 +60,8 @@ defmodule Api.BlobController do
     len = Storage.save_full_upload(path, name, uuid)
     conn
       |> put_resp_header("location", conn.request_path)
-      |> put_resp_header("docker-upload-uuid",uuid)
-      |> put_resp_header("range","0-#{len}")
+      |> put_resp_header("docker-upload-uuid", uuid)
+      |> put_resp_header("range", "0-#{len}")
       |> send_resp(202, "")
   end
 
@@ -87,12 +87,12 @@ defmodule Api.BlobController do
        detail: %{}
   end
 
-  def init_upload(conn, %{"name" => name,"mount" => _mount } = _params) do
+  def init_upload(conn, %{"name" => name, "mount" => _mount } = _params) do
     upload_id = Storage.create_blob(name)
     conn
     |> put_resp_header("location", conn.request_path <> upload_id)
-    |> put_resp_header("docker-upload-uuid",upload_id)
-    |> put_resp_header("range","0-0")
+    |> put_resp_header("docker-upload-uuid", upload_id)
+    |> put_resp_header("range", "0-0")
     |> send_resp(201, "")
   end
 
@@ -101,11 +101,11 @@ defmodule Api.BlobController do
     conn
     |> put_resp_header("location", conn.request_path <> upload_id)
     |> put_resp_header("docker-upload-uuid",upload_id)
-    |> put_resp_header("range","0-0")
+    |> put_resp_header("range", "0-0")
     |> send_resp(202, "")
   end
 
-  def delete(conn,_params) do
+  def delete(_conn, _params) do
     raise Api.DockerError,message: "The operation is unsupported",
                          code: "UNSUPPORTED",
                          plug_status: 405,

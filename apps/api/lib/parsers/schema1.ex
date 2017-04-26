@@ -9,7 +9,7 @@ defmodule Api.Parsers.Schema1 do
     {:ok, %{"data" => body}, conn}
   end
 
-  def parse(conn, type, subtype, _headers, _opts) do
+  def parse(conn, _type, _subtype, _headers, _opts) do
     {:next, conn}
   end
 

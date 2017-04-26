@@ -100,6 +100,13 @@ defmodule Api.BlobControllerTest do
     assert response(conn, 404)
   end
 
+  test "GET blob  invalid url resolve II", %{conn: conn} do
+    name = "test/test/../"
+    uuid = "a12341231"
+    conn = get conn, "/v2/#{name}/blobs/#{uuid}"
+    assert response(conn, 404)
+  end
+
   test "HEAD blob  invalid url resolve", %{conn: conn} do
     name = "Test/test"
     uuid = "1@234-1231"

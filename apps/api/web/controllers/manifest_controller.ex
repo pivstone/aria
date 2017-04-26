@@ -4,26 +4,20 @@ defmodule Api.ManifestController do
   @scheme1 "application/vnd.docker.distribution.manifest.v1+prettyjws"
   @scheme2 "application/vnd.docker.distribution.manifest.v2+json"
 
-
   @doc """
   返回指定 Image 的 Manifest
   """
-  def get(conn, %{"name" => name, "tag" => tag} = params) do
-    render conn, "index.json",data: params
-  end
-
-  @doc """
-  返回指定 Image 的 Manifest
-  """
-  def get(conn, %{"name" => name, "digest" => digest} = _params) do
-    content = Storage.get_manifest(name, digest)
-    accept_list = conn.accepts
+  def get(conn, %{"name" => name, "digest" => digest ,"tag" => tag} = _params) do
+    refs = digest != "" && digest || tag
+    content = Storage.get_manifest(name, refs)
+    accept_list = get_req_header(conn, "accept")
     schema_v2 =
-      if Enum.member?(@scheme1,accept_list) and not Enum.member?(@scheme2,accept_list) do
+      if Enum.member?(accept_list,@scheme1) and not Enum.member?(accept_list,@scheme2) do
          false
       else
         true
       end
+    IO.puts schema_v2
     manifest = Poison.decode!(content)
     # 本地存储的 manifest version
     manifest_version = not Map.has_key?(manifest,"mediaType") && 1 || 2
@@ -39,14 +33,23 @@ defmodule Api.ManifestController do
             detail: %{}
     end
     conn
-    |> put_req_header("content-Type",@scheme2)
+    |> put_resp_header("content-type",@scheme2)
     |> send_resp(:ok,content)
+  end
+
+
+
+  @doc """
+  返回指定 Image 的 Manifest
+  """
+  def get(conn, params) do
+    render conn, "index.json",data: params
   end
 
   @doc """
   保存 Manifest
   """
-  def put(conn,%{"name" => name, "digest" => digest, "tag" => tag, "data" => data} = params) do
+  def put(conn,%{"name" => name, "digest" => _digest, "tag" => tag, "data" => data} = _params) do
     [schema] = get_req_header(conn, "content-type")
     if schema == nil  do
       raise Storage.FileError,
