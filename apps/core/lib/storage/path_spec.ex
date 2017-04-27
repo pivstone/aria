@@ -34,8 +34,6 @@ defmodule Storage.PathSpec do
                 -> current/link
                 -> index
                     -> <algorithm>/<hex digest>/link
-        -> _layers/
-            <layer links to blob store>
         -> _uploads/<id>
             data
             startedat        # 上传文件的时间而已，个人觉得改成 Info 更合适一些
@@ -46,16 +44,6 @@ defmodule Storage.PathSpec do
 	def data_dir do
 	  Application.get_env(:core, __MODULE__)[:data_dir]
 	end
-
-	@doc """
-	上传文件的信息
-	:param name: 镜像名 UUID
-	:param uuid:
-	:return:
-	"""
-	def get_upload_info_path(name, uuid) do
-    "#{data_dir()}/#{name}/_uploads/#{uuid}/info"
-  end
 
 	@doc """
 	上传文件的临时路径
@@ -105,14 +93,4 @@ defmodule Storage.PathSpec do
     [hash_method, hash_value] = digest |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/revisions/#{hash_method}/#{hash_value}"
   end
-
-	@doc """
-	获取 Layers 存储路径
-	:param name:
-	:return:
-	"""
-	def get_layer_path( name, digest) do
-	  [hash_method, hash_value] = digest |> String.split(":", parts: 2)
-	  "#{data_dir()}/#{name}/_layers/#{hash_method}/#{hash_value}"
-	end
 end

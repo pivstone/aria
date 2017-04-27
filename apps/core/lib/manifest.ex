@@ -156,19 +156,6 @@ defmodule Manifest do
     # Save reference
     reference_path = Storage.PathSpec.get_reference_path(name, manifest_digest)
     Storage.link(manifest_digest, reference_path)
-
-    for layer <- get_layers(manifest) do
-      layer_path = Storage.PathSpec.get_layer_path(name, layer)
-      Storage.link(layer, layer_path)
-    end
   end
 
-
-  defp get_layers(manifest) do
-    data = Poison.decode!(manifest)
-    case Map.get(data,"schemaVersion") do
-      1 -> for layer <- Map.get(data,"fsLayers"),do: Map.get(layer,"blobSum")
-      2 -> for layer <- Map.get(data,"layers"),do: Map.get(layer,"digest")
-    end
-  end
 end
