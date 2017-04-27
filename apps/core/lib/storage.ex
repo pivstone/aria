@@ -19,7 +19,7 @@ defmodule Storage do
     raise "Not Support Hash Method"
   end
 
-  def commit(name,uuid,digest) do
+  def commit(name, uuid, digest) do
     file_name = Storage.PathSpec.get_upload_path(name, uuid)
     target_name = Storage.PathSpec.get_blob_path(name, digest)
     driver().move(file_name, target_name)
