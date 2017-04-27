@@ -30,8 +30,6 @@ defmodule Api.BlobController do
   end
 
 
-
-
   @doc """
   完成 Blob 上传流程。并进行必要的检查
   """
@@ -41,7 +39,7 @@ defmodule Api.BlobController do
     file_digest = Storage.get_blob_digest(name, uuid, hash_method)
     if value != file_digest do
       Logger.warn("Blob upload digest didnt match #{file_digest} != #{value}")
-      raise Api.DockerError,
+      raise Docker.Exception,
         message: "digest did not match uploaded content",
         code: "BLOB_UPLOAD_INVALID",
         plug_status: 400,
@@ -80,7 +78,7 @@ defmodule Api.BlobController do
   """
   def init_upload(_conn, %{"name" => name} = _params) when byte_size(name) > 256 do
     Logger.warn("Image name invalid : #{name}")
-    raise Api.DockerError,
+    raise Docker.Exception,
       message: "invalid repository name",
        code: "NAME_INVALID",
        plug_status: 400,
@@ -106,7 +104,7 @@ defmodule Api.BlobController do
   end
 
   def delete(_conn, _params) do
-    raise Api.DockerError,message: "The operation is unsupported",
+    raise Docker.Exception ,message: "The operation is unsupported",
                          code: "UNSUPPORTED",
                          plug_status: 405,
                          detail: %{}

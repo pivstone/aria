@@ -4,9 +4,10 @@ defmodule Api.ManifestControllerTest do
 
   test "GET manifests fetch url resolve", %{conn: conn} do
     name = "test/test"
-    ref = "1-dev"
+    ref = "latest"
+    conn = put_req_header(conn,"content-type", "application/vnd.docker.distribution.manifest.v1+prettyjws")
     conn = get conn, "/v2/#{name}/manifests/#{ref}"
-    assert json_response(conn, 200) == %{"name" => name, "digest" => "", "tag" => ref}
+    assert json_response(conn, 200)
   end
 
   test "PUT manifests fetch url resolve", %{conn: conn} do
@@ -26,7 +27,8 @@ defmodule Api.ManifestControllerTest do
 
   test "HEAD manifests fetch url resolve", %{conn: conn} do
     name = "test/test"
-    ref = "1-dev"
+    ref = "latest"
+    conn = put_req_header(conn,"content-type", "application/vnd.docker.distribution.manifest.v1+prettyjws")
     conn = head conn, "/v2/#{name}/manifests/#{ref}"
     assert response(conn, 200)
   end

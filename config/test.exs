@@ -1,6 +1,6 @@
 use Mix.Config
 
-config :storage, Storage.PathSpec,
+config :core, Storage.PathSpec,
 	data_dir: Path.absname("./_tmp")
 
 config :plug,

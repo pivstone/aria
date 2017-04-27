@@ -17,10 +17,10 @@ import_config "../apps/*/config/config.exs"
 #       metadata: [:user_id]
 
 
-config :storage, Storage.PathSpec,
+config :core, Storage.PathSpec,
 	data_dir: System.cwd <>"/data"
 
-config :storage, Storage,
+config :core, Storage,
 	driver: Storage.FileDriver
 
 import_config "#{Mix.env}.exs"

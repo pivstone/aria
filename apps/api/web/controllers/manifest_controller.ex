@@ -12,21 +12,22 @@ defmodule Api.ManifestController do
     content = Storage.get_manifest(name, refs)
     accept_list = get_req_header(conn, "accept")
     schema_v2 =
-      if Enum.member?(accept_list,@scheme1) and not Enum.member?(accept_list,@scheme2) do
-         false
-      else
+      if Enum.member?(accept_list, @scheme2) and not Enum.member?(accept_list, @scheme1) do
         true
+      else
+        false
       end
-    IO.puts schema_v2
     manifest = Poison.decode!(content)
     # 本地存储的 manifest version
     manifest_version = not Map.has_key?(manifest,"mediaType") && 1 || 2
-
-    if not schema_v2 and manifest_version != 1 do
-       # TODO v2 -> v1
-    end
+    content =
+      if not schema_v2 and manifest_version != 1 do
+         Manifest.transform_v2_to_v1(content,name,refs)
+      else
+        content
+      end
     if schema_v2 and manifest_version == 1 do
-      raise Api.DockerError,
+      raise Docker.Exception,
             message: "manifest unsupported",
             code: "MANIFEST UNSUPPORTED",
             plug_status: 415,
@@ -52,13 +53,13 @@ defmodule Api.ManifestController do
   def put(conn,%{"name" => name, "digest" => _digest, "tag" => tag, "data" => data} = _params) do
     [schema] = get_req_header(conn, "content-type")
     if schema == nil  do
-      raise Storage.FileError,
+      raise Docker.Exception,
               message: "Manifest Invalid",
               code: "MANIFEST_INVALID",
               plug_status: 400
     end
     if not schema in [@scheme1, @scheme2] do
-      raise Storage.FileError,
+      raise Docker.Exception,
               message: "The operation is unsupported",
               code: "UNSUPPORTED",
               plug_status: 405

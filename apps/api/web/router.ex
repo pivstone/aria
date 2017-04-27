@@ -27,7 +27,8 @@ defmodule Api.Router do
     patch  "/*name",    DockerRouter,   :patch
   end
 
-  def handle_errors(conn, %{reason: %Api.DockerError{} = exception}) do
+
+  def handle_errors(conn, %{reason: %Docker.Exception{} = exception}) do
     reason = %{"errors" => [%{"code" => exception.code,
                              "message"=> exception.message,
                              "detail" => exception.detail}]}
@@ -37,18 +38,7 @@ defmodule Api.Router do
     |> send_resp(conn.status,body)
   end
 
-
-  def handle_errors(conn, %{reason: %Storage.FileError{} = exception}) do
-    reason = %{"errors" => [%{"code" => exception.code,
-                             "message"=> exception.message,
-                             "detail" => exception.detail}]}
-    body = Poison.encode! reason
-    conn
-    |> put_req_header("content_type", "application/json")
-    |> send_resp(conn.status,body)
-  end
-
-  def handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{} = exception}=_assigns) do
+  def handle_errors(conn, %{reason: %Phoenix.Router.NoRouteError{} = _exception} = _assigns) do
     send_resp(conn, conn.status, "Not Found")
   end
 

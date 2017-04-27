@@ -44,7 +44,7 @@ defmodule Storage.PathSpec do
 	          <split directory content addressable storage>
 	"""
 	def data_dir do
-	  Application.get_env(:storage,__MODULE__)[:data_dir]
+	  Application.get_env(:core, __MODULE__)[:data_dir]
 	end
 
 	@doc """

@@ -84,8 +84,8 @@ defmodule Storage.FileDriver do
   """
   def check_file(path) do
     if not File.exists?(path) do
-      Logger.debug(path)
-      raise Storage.FileError,
+      Logger.warn(path)
+      raise Docker.Exception,
         message: "blob unknown",
         code: "BLOB_UNKNOWN",
         plug_status: 404

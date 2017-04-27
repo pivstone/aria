@@ -3,7 +3,7 @@ defmodule Api.ImageControllerTest do
 
   test "GET catalog url resolve", %{conn: conn} do
     conn = get conn, "/v2/_catalog"
-    assert json_response(conn, 200) == %{"repositories" => []}
+    assert json_response(conn, 200) == %{"repositories" => ["test/test"]}
   end
 
   test "GET image tag list url resolve", %{conn: conn} do

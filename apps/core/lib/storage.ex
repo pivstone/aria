@@ -4,7 +4,7 @@ defmodule Storage do
   """
   @default_driver Storage.FileDriver
   def driver do
-    Application.get_env(:storage, __MODULE__, [])[:driver]||@default_driver
+    Application.get_env(:core, __MODULE__, [])[:driver]||@default_driver
   end
 
   @doc """
@@ -70,6 +70,7 @@ defmodule Storage do
     len = len + 1
     "#{prefix}/**/_uploads"
     |> driver().list([keyword])
+    |> Enum.slice(0..count)
     |> Enum.reduce([],fn(x,acc) -> [x |> String.slice(len..-10) |acc] end)
   end
 
