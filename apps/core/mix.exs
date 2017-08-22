@@ -36,6 +36,8 @@ defmodule Storage.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+    {:phoenix_pubsub, "~> 1.0"},
+    ]
   end
 end
