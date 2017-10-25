@@ -1,0 +1,25 @@
+# App artifacts
+apps/*/_build
+config/prod.secret.exs
+apps/**/config/prod.secret.exs
+db
+rel
+deps
+.git
+*.ez
+apps/**/node_modules/
+apps/**/priv/static/
+
+# Generated on crash by the VM
+erl_crash.dump
+
+# Static artifacts
+.gitignore
+LICENSE
+VERSION
+*.md
+package-lock.json
+.idea/
+_tmp
+data
+mix.lock

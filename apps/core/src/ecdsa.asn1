@@ -1,7 +1,0 @@
-Ecdsa DEFINITIONS ::=
-BEGIN
-  Sig ::= SEQUENCE {
-    r INTEGER,
-    s INTEGER
-  }
-END

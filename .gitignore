@@ -1,6 +1,7 @@
 # The directory Mix will write compiled artifacts to.
-/_build
+/apps/web/_build
 
+/_build
 # If you run "mix test --cover", coverage assets end up here.
 /cover
 
@@ -23,4 +24,13 @@ erl_crash.dump
 
 aria.iml
 
-_tmp/
+_tmp
+
+# Since we are building assets from web/static,
+# we ignore priv/static. You may want to comment
+# this depending on your deployment strategy.
+/priv/static/
+
+data
+
+mix.lock

@@ -2,10 +2,13 @@ defmodule Aria.Mixfile do
   use Mix.Project
 
   def project do
-    [apps_path: "apps",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      apps_path: "apps",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      aliases: aliases(),
+      deps: deps()
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -23,6 +26,15 @@ defmodule Aria.Mixfile do
   defp deps do
     [
       {:credo, "~> 0.7", only: [:dev, :test]},
+    ]
+  end
+
+  defp aliases do
+    [
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "test": ["test"],
+      "run": ["phoenix.server"]
     ]
   end
 end
