@@ -16,6 +16,11 @@ import_config "../apps/*/config/config.exs"
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 
+# Configures Elixir's Logger
+config :logger, :console,
+       format: "$time $metadata[$level] $message\n",
+       metadata: [:request_id]
+
 
 config :core, Storage.PathSpec,
 	data_dir: System.cwd <>"/data"
@@ -23,4 +28,10 @@ config :core, Storage.PathSpec,
 config :core, Storage,
 	driver: Storage.FileDriver
 
+
+config :dashboard, Dashboard.Repo,
+  registry_host: "reg.example.com"
+
+config :accelerator, Accelerator.DockerUrl,
+       upstream: "https://hub.c.163.com/v2/"
 import_config "#{Mix.env}.exs"
