@@ -24,6 +24,10 @@ erl_crash.dump
 
 aria.iml
 
+apps/*/priv/static/
+
+apps/*/config/prod.secret.exs
+
 _tmp
 
 # Since we are building assets from web/static,
