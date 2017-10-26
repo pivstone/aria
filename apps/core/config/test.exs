@@ -31,3 +31,5 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
+config :core, Storage.PathSpec,
+       data_dir: System.cwd <> "/_core/_tmp"

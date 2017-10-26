@@ -5,7 +5,7 @@ defmodule Storage.Exception do
   defexception [:message, :code, :detail, :plug_status]
 end
 
-defimpl Aria.Exception, for: Storage.Exception do
+defimpl Core.Exception, for: Storage.Exception do
   def body(exception) do
     Poison.encode! %{"errors" => [%{"code" => exception.code,
                     "message"=> exception.message,

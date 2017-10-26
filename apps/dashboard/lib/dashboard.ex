@@ -11,7 +11,7 @@ defmodule Dashboard do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      supervisor(Dashboard.Endpoint, []),
+      #,
       supervisor(Dashboard.Repo, []),
       supervisor(Dashboard.Subscriber, []),
       supervisor(Dashboard.Checker, []),
@@ -19,6 +19,12 @@ defmodule Dashboard do
       # Dashboard.Worker.start_link(arg1, arg2, arg3)
       # worker(Dashboard.Worker, [arg1, arg2, arg3]),
     ]
+    children =
+      if Mix.env == :test do
+        [supervisor(Dashboard.Endpoint, []) | children]
+      else
+        children
+      end
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options

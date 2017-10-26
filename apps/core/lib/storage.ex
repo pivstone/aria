@@ -4,9 +4,8 @@ defmodule Storage do
   """
   require Logger
 
-  @default_driver Storage.FileDriver
   def driver do
-    Application.get_env(:aria_core, __MODULE__, [])[:driver] || @default_driver
+    Application.fetch_env!(:core, __MODULE__)[:driver]
   end
 
   @doc """
@@ -24,11 +23,11 @@ defmodule Storage do
   @doc """
   Remove specified tag from repo via *digest*
   """
-  def untag(name,"sha256:" <> _ = digest) do
+  def untag(_name, "sha256:" <> _ = _digest) do
     raise Storage.Exception,
-      message: "operation is not supported yet.",
-      code: "OPTS_NOT_SUPPORTED",
-      plug_status: 405
+          message: "operation is not supported yet.",
+          code: "OPTS_NOT_SUPPORTED",
+          plug_status: 405
     # TODO: delete revision_path
     # TODO: Fetch all tags
     # TODO: check tags link value
@@ -52,11 +51,11 @@ defmodule Storage do
     if not exists?(name, digest) do
       Logger.warn(fn -> "manifest:#{name} verify failed cause:layer:#{digest} length is zero" end)
       raise Storage.Exception,
-        message: "blob unknown to registry",
-        code: "BLOB_UNKNOWN",
-        plug_status: 400
+            message: "blob unknown to registry",
+            code: "BLOB_UNKNOWN",
+            plug_status: 400
     end
-    verify_digest(name,digest)
+    verify_digest(name, digest)
   end
 
   defp verify_digest(name, "sha256:" <> except_digest = digest) do
@@ -64,9 +63,9 @@ defmodule Storage do
     if except_digest != driver().digest(path) do
       Logger.warn(fn -> "manifest:#{name} verify failed cause:layer:#{digest} invalid" end)
       raise Storage.Exception,
-       message: "manifest unverified",
-       code: "MANIFEST_UNVERIFIED",
-       plug_status: 400
+            message: "manifest unverified",
+            code: "MANIFEST_UNVERIFIED",
+            plug_status: 400
     end
   end
 
@@ -90,10 +89,13 @@ defmodule Storage do
     link = tag_current_path <> "/link"
     if not driver().exists?(link) do
       raise Storage.Exception,
-        message: "manifest unknown",
-        code: "MANIFEST_UNKNOWN",
-        plug_status: 404,
-        detail: %{"Name" => name, "Tag" => reference}
+            message: "manifest unknown",
+            code: "MANIFEST_UNKNOWN",
+            plug_status: 404,
+            detail: %{
+              "Name" => name,
+              "Tag" => reference
+            }
     end
     digest = driver().read(link)
     manifest_path = Storage.PathSpec.get_blob_path(name, digest)
@@ -126,11 +128,11 @@ defmodule Storage do
   @doc """
   创建上传的文件时候的 Blob 文件
   """
-    def create_blob(_name) do
+  def create_blob(_name) do
     32
     |> :crypto.strong_rand_bytes
     |> Base.encode16(case: :lower)
-    end
+  end
 
   @doc ~s"""
   ### Example
@@ -143,21 +145,36 @@ defmodule Storage do
   """
   def get_repositories(keyword) do
     prefix = Storage.PathSpec.data_dir
-    len = prefix |> String.length
+    len = prefix
+          |> String.length
     len = len + 1
     "#{prefix}/#{keyword}*/**/_manifests"
     |> driver().list()
-    |> Enum.reduce([], fn(x, acc) -> [x |> String.slice(len..-12) |acc] end)
+    |> Enum.reduce(
+         [],
+         fn (x, acc) ->
+           [x|> String.slice(len..-12) | acc]
+         end
+       )
   end
 
   def get_repositories(keyword, count) do
     prefix = Storage.PathSpec.data_dir
-    len = prefix |> String.length
+    len = prefix
+          |> String.length
     len = len + 1
-   "#{prefix}/#{keyword}*/**/_uploads"
+    "#{prefix}/#{keyword}*/**/_uploads"
     |> driver().list()
     |> Enum.slice(0..count)
-    |> Enum.reduce([], fn(x, acc) -> [x |> String.slice(len..-10) |acc] end)
+    |> Enum.reduce(
+         [],
+         fn (x, acc) ->
+           [
+             x
+             |> String.slice(len..-10) | acc
+           ]
+         end
+       )
   end
 
   @doc ~s"""
@@ -171,14 +188,22 @@ defmodule Storage do
     tag_path = Storage.PathSpec.get_tags_path(name)
     if not driver().exists?(tag_path) do
       raise Storage.Exception,
-         message: "repository not found",
-         code: "REPOSITORY_NOT_FOUND",
-         plug_status: 404
+            message: "repository not found",
+            code: "REPOSITORY_NOT_FOUND",
+            plug_status: 404
     end
     len = 1 + String.length(tag_path)
     "#{tag_path}/*"
-      |> driver().list
-      |> Enum.reduce([], fn(x, acc) -> [x |> String.slice(len..-1) |acc] end)
+    |> driver().list
+    |> Enum.reduce(
+         [],
+         fn (x, acc) ->
+           [
+             x
+             |> String.slice(len..-1) | acc
+           ]
+         end
+       )
   end
 
   def blob_stream(name, digest) do
@@ -223,10 +248,10 @@ defmodule Storage do
   def save_manifest(name, data)do
     hash = :sha256
     digest = hash
-    |> :crypto.hash_init
-    |> :crypto.hash_update(data)
-    |> :crypto.hash_final
-    |> Base.encode16(case: :lower)
+             |> :crypto.hash_init
+             |> :crypto.hash_update(data)
+             |> :crypto.hash_final
+             |> Base.encode16(case: :lower)
 
     digest_name = ~s(#{hash}) <> ":" <> digest
     target_name = Storage.PathSpec.get_blob_path(name, digest_name)
@@ -260,12 +285,14 @@ defmodule Storage do
     {:error,"repo not found"}
   """
   def lock(name) do
-   if exists?(name) do
-    name |> Storage.PathSpec.get_lock_file |> driver().save(<<"">>)
-   else
-    {:error,"repo not found"}
-   end
- end
+    if exists?(name) do
+      name
+      |> Storage.PathSpec.get_lock_file
+      |> driver().save(<<"">>)
+    else
+      {:error, "repo not found"}
+    end
+  end
   @doc ~s"""
   解除锁定镜像
   ### Example
@@ -280,12 +307,18 @@ defmodule Storage do
     iex> Storage.locked?("test/test")
     false
   """
-  def unlock(name), do: name |> Storage.PathSpec.get_lock_file |> driver().delete()
+  def unlock(name),
+      do: name
+          |> Storage.PathSpec.get_lock_file
+          |> driver().delete()
 
   @doc ~S"""
   Return `true` if the repo is locked
   """
-  def locked?(name), do: name |> Storage.PathSpec.get_lock_file |> driver().exists?()
+  def locked?(name),
+      do: name
+          |> Storage.PathSpec.get_lock_file
+          |> driver().exists?()
 
   @doc ~s"""
   Delete the repo
@@ -298,7 +331,9 @@ defmodule Storage do
     :ok
     iex> Storage.delete_repo("example")
     {:ok,["#{Storage.PathSpec.data_dir()}/example", "#{Storage.PathSpec.data_dir()}/example/_manifests",
-                 "#{Storage.PathSpec.data_dir()}/example/_manifests/tags", "#{Storage.PathSpec.data_dir()}/example/.lock"]}
+                 "#{Storage.PathSpec.data_dir()}/example/_manifests/tags", "#{
+    Storage.PathSpec.data_dir()
+  }/example/.lock"]}
     iex> Storage.exists?("example")
     false
   """

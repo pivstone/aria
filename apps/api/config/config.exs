@@ -6,20 +6,8 @@
 use Mix.Config
 
 # Configures the endpoint
-config :api, Api.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "DdbdcHD+vewco0glNMUqp/5CK20UUF79LWc8Cq1T7WcXYTTDWMoIPXo+pnVseUoE",
-  render_errors: [view: Api.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Api.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
-
-
-config :mime, :types, %{
-  "application/vnd.docker.distribution.manifest.v1+prettyjws" => ["manifest.v1-prettyjws"],
-  "application/vnd.docker.distribution.manifest.v2+json" => ["manifest.v2-json"],
-  "application/vnd.docker.distribution.manifest.list.v2+json" => ["manifest.v2.list-json"]
-}

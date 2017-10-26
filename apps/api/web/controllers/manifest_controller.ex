@@ -15,7 +15,6 @@ defmodule Api.ManifestController do
     manifest = Poison.decode!(content)
     # 本地存储的 manifest version
     manifest_version = Map.has_key?(manifest, "mediaType") && 2 || 1
-    type = @scheme2
     content =
       if schema_v1 and manifest_version != 1 do
         manifest |> Manifest.transform_v2_to_v1(name, refs) |> Poison.encode!(pretty: true)

@@ -20,7 +20,7 @@ defmodule Api.ImageController do
     end
   end
 
-  def get(conn, %{"name" => name}) do
+  def get(_conn, %{"name" => name}) do
     raise Storage.Exception,
       message: "repository not found",
       code: "REPOSITORY_NOT_FOUND",

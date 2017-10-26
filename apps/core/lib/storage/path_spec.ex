@@ -39,7 +39,7 @@ defmodule Storage.PathSpec do
             <split directory content addressable storage>
   """
   def data_dir do
-    Application.get_env(:aria_core, __MODULE__)[:data_dir] || "_tmp"
+    Application.fetch_env!(:core, __MODULE__)[:data_dir]
   end
 
   @doc """
@@ -59,8 +59,12 @@ defmodule Storage.PathSpec do
   :return:
   """
   def get_blob_path(name, digest) do
-    [hash_method, digest_value] = digest |> String.split(":", parts: 2)
-    "#{data_dir()}/#{name}/_blob/#{hash_method}/#{digest_value |> String.slice(0..1)}/#{digest_value}/data"
+    [hash_method, digest_value] = digest
+                                  |> String.split(":", parts: 2)
+    "#{data_dir()}/#{name}/_blob/#{hash_method}/#{
+      digest_value
+      |> String.slice(0..1)
+    }/#{digest_value}/data"
   end
 
   def get_tags_path(name) do
@@ -82,12 +86,14 @@ defmodule Storage.PathSpec do
   end
 
   def get_tag_index_path(name, tag_name, digest) do
-    [hash_method, hash_value] = digest |> String.split(":", parts: 2)
+    [hash_method, hash_value] = digest
+                                |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}/index/#{hash_method}/#{hash_value}"
   end
 
   def get_reference_path(name, digest) do
-    [hash_method, hash_value] = digest |> String.split(":", parts: 2)
+    [hash_method, hash_value] = digest
+                                |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/revisions/#{hash_method}/#{hash_value}"
   end
 

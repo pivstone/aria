@@ -251,7 +251,7 @@ defmodule Manifest do
   	:crypto.verify(:ecdsa, :sha256, msg, sig, [key, @named_curve])
   end
 
-  def save(_manifest, nil, reference), do: Logger.error fn -> "" end
+  def save(_manifest, nil, _reference), do: Logger.error fn -> "" end
   def save(manifest, name, reference) do
     manifest_digest = Storage.save_manifest(name, manifest)
     current_tag_path = Storage.PathSpec.get_tag_current_path(name, reference)

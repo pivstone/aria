@@ -5,16 +5,6 @@
 # is restricted to this project.
 use Mix.Config
 
-# Configures the endpoint
-config :server, Server.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "ebNdrraHv11O2vWKYGJ8IO1GBF2MIAt3gSpiIImCF7z8wp7lwRBupndORHN+ntWf",
-  render_errors: [view: Server.ErrorView, accepts: ~w(json)]
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
 
 
 config :mime, :types, %{

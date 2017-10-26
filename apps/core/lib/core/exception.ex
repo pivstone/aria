@@ -1,4 +1,4 @@
-defprotocol Aria.Exception do
+defprotocol Core.Exception do
 
   @moduledoc """
   异常处理 handler
@@ -39,7 +39,7 @@ defprotocol Aria.Exception do
 end
 
 
-defimpl Aria.Exception, for: Any do
+defimpl Core.Exception, for: Any do
   require Logger
 
   def body(exception) do
@@ -55,7 +55,7 @@ defimpl Aria.Exception, for: Any do
 end
 
 
-defimpl Aria.Exception, for: Atom do
+defimpl Core.Exception, for: Atom do
   require Logger
   def body(exception) do
     messgae = ~s/#{exception}/

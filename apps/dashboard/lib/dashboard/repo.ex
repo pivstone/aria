@@ -81,7 +81,7 @@ defmodule Dashboard.Repo do
   @doc ~S"""
   ### Exmaples
     iex> Dashboard.Repo.registry_host()
-    "hub.example.net"
+    "reg.example.com"
   """
   def registry_host do
     Application.get_env(:dashboard, __MODULE__, [])[:registry_host]
@@ -175,8 +175,7 @@ defmodule Dashboard.Repo do
   end
 
   def data_file do
-    System.cwd()
-      |> Path.join(PathSpec.data_dir())
+    PathSpec.data_dir()
       |> Path.join("meta.data")
       |> String.to_charlist
   end

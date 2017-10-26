@@ -14,7 +14,6 @@ defmodule Server.Mixfile do
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -25,14 +24,7 @@ defmodule Server.Mixfile do
   def application do
     [
       mod: {Server, []},
-      applications: [
-        :phoenix,
-        :phoenix_pubsub,
-        :cowboy,
-        :logger,
-        :gettext,
-        :hackney
-      ]
+      extra_applications: [:logger]
     ]
   end
 
@@ -46,24 +38,12 @@ defmodule Server.Mixfile do
 
   defp deps do
     [
+      {:api, in_umbrella: true},
+      {:dashboard, in_umbrella: true},
       {:phoenix, "~> 1.2.1"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
     ]
   end
 
-  # Aliases are shortcuts or tasks specific to the current project.
-  # For example, to create, migrate and run the seeds file at once:
-  #
-  #     $ mix ecto.setup
-  #
-  # See the documentation for `Mix` for more info on aliases.
-  defp aliases do
-    [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["test"],
-      "run": ["phoenix.server"]
-    ]
-  end
 end

@@ -11,7 +11,6 @@ defmodule Storage.FileDriver do
   """
   def move(src, dist) do
     ensure_dir(dist)
-    File.rename(src, dist)
     # TODO:  add move test in docker
     with :ok <- File.cp!(src, dist),
        :ok <- src |> File.rm!,

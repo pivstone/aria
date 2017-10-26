@@ -7,7 +7,7 @@ defmodule Api.ManifestControllerTest do
     ref = "latest"
     conn = put_req_header(conn,"accept", "application/vnd.docker.distribution.manifest.v1+prettyjws")
     conn = get conn, "/v2/#{name}/manifests/#{ref}"
-    assert json_response(conn, 200)
+    assert response(conn, 200)
   end
 
 

@@ -17,21 +17,23 @@ import_config "../apps/*/config/config.exs"
 #       metadata: [:user_id]
 
 # Configures Elixir's Logger
-config :logger, :console,
-       format: "$time $metadata[$level] $message\n",
-       metadata: [:request_id]
+# Configures the endpoint
 
+config :server,
+       Server.Endpoint,
+       url: [
+         host: "localhost"
+       ],
+       secret_key_base: "ebNdrraHv11O2vWKYGJ8IO1GBF2MIAt3gSpiIImCF7z8wp7lwRBupndORHN+ntWf",
+       render_errors: [
+         view: Server.ErrorView,
+         accepts: ~w(json)
+       ]
 
-config :core, Storage.PathSpec,
-	data_dir: System.cwd <>"/data"
+config :mime, :types, %{
+  "application/vnd.docker.distribution.manifest.v1+prettyjws" => ["manifest.v1-prettyjws"],
+  "application/vnd.docker.distribution.manifest.v2+json" => ["manifest.v2-json"],
+  "application/vnd.docker.distribution.manifest.list.v2+json" => ["manifest.v2.list-json"]
+}
 
-config :core, Storage,
-	driver: Storage.FileDriver
-
-
-config :dashboard, Dashboard.Repo,
-  registry_host: "reg.example.com"
-
-config :accelerator, Accelerator.DockerUrl,
-       upstream: "https://hub.c.163.com/v2/"
 import_config "#{Mix.env}.exs"

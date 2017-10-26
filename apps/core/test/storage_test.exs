@@ -8,4 +8,5 @@ defmodule StorageTest do
     assert Storage.get_tags("untag") == ["latest"]
   end
 
+
 end
