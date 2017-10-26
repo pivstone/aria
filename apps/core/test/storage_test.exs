@@ -7,6 +7,5 @@ defmodule StorageTest do
     assert Storage.untag("untag", "1.0.1") == {:ok, ["#{Storage.PathSpec.data_dir()}/untag/_manifests/tags/1.0.1"]}
     assert Storage.get_tags("untag") == ["latest"]
   end
-
-
+  
 end

@@ -137,7 +137,7 @@ defmodule Storage do
   @doc ~s"""
   ### Example
     iex> Storage.get_repositories("")
-    ["test/test", "registry"]
+    ["untag", "test/test", "registry"]
     iex> Storage.get_repositories("test")
     ["test/test"]
     iex> Storage.get_repositories("abc")
