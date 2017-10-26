@@ -48,7 +48,7 @@ defmodule Storage.PathSpec do
   :param uuid:
   :return:
   """
-  def get_upload_path(name, uuid) do
+  def upload_path(name, uuid) do
     "#{data_dir()}/#{name}/_uploads/#{uuid}/data"
   end
 
@@ -58,7 +58,7 @@ defmodule Storage.PathSpec do
   :param name: repository name
   :return:
   """
-  def get_blob_path(name, digest) do
+  def blob_path(name, digest) do
     [hash_method, digest_value] = digest
                                   |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_blob/#{hash_method}/#{
@@ -67,7 +67,7 @@ defmodule Storage.PathSpec do
     }/#{digest_value}/data"
   end
 
-  def get_tags_path(name) do
+  def tags_path(name) do
     "#{data_dir()}/#{name}/_manifests/tags"
   end
 
@@ -77,31 +77,42 @@ defmodule Storage.PathSpec do
   :param tag_name: tag name
   :return:
   """
-  def get_tag_path(name, tag_name) do
+  def tag_path(name, tag_name) do
     "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}"
   end
 
-  def get_tag_current_path(name, tag_name) do
+  def tag_current_path(name, tag_name) do
     "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}/current"
   end
 
-  def get_tag_index_path(name, tag_name, digest) do
+  def tag_index_path(name, tag_name, digest) do
     [hash_method, hash_value] = digest
                                 |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/tags/#{tag_name}/index/#{hash_method}/#{hash_value}"
   end
 
-  def get_reference_path(name, digest) do
+  def reference_path(name, digest) do
     [hash_method, hash_value] = digest
                                 |> String.split(":", parts: 2)
     "#{data_dir()}/#{name}/_manifests/revisions/#{hash_method}/#{hash_value}"
   end
 
-  def get_repo_path(name) do
+  def repo_path(name) do
     "#{data_dir()}/#{name}"
   end
 
-  def get_lock_file(name) do
+  def lock_file(name) do
     "#{data_dir()}/#{name}/.lock"
+  end
+  @doc """
+  获取需要删除的数据路径
+  """
+  def delete_path(name) do
+    [
+      "#{data_dir()}/#{name}/_manifests",
+      "#{data_dir()}/#{name}/_blob",
+      "#{data_dir()}/#{name}/_uploads",
+      "#{data_dir()}/#{name}/.lock",
+    ]
   end
 end

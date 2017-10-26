@@ -8,7 +8,7 @@ defmodule Api.BlobController do
   """
   def get(conn, %{"name" => name, "digest" => digest, "head"=> true} = _params) do
     if Storage.exists?(name, digest) do
-      content_len = Storage.get_blob_size(name, digest)
+      content_len = Storage.blob_size(name, digest)
       conn
       |> put_resp_header("content-length", ~s(#{content_len}))
       |> send_resp(:ok, "")

@@ -9,7 +9,7 @@ defmodule Api.ManifestController do
   """
   def get(conn, %{"name" => name, "digest" => digest, "tag" => tag} = _params) do
     refs = digest != "" && digest || tag
-    content = Storage.get_manifest(name, refs)
+    content = Storage.manifest(name, refs)
     accept_list = get_req_header(conn, "accept")
     schema_v1 = Enum.member?(accept_list, @scheme1)
     manifest = Poison.decode!(content)

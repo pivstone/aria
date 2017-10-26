@@ -11,12 +11,12 @@ defmodule Storage do
   @doc """
   获取 Blob 文件的 Digest 值
   """
-  def get_blob_digest(name, uuid, hash_method) when hash_method == "sha256" do
-    uuid_path = Storage.PathSpec.get_upload_path(name, uuid)
+  def blob_digest(name, uuid, hash_method) when hash_method == "sha256" do
+    uuid_path = Storage.PathSpec.upload_path(name, uuid)
     driver().digest(uuid_path)
   end
 
-  def get_blob_digest(_name, _uuid, _hash_method) do
+  def blob_digest(_name, _uuid, _hash_method) do
     raise "Not Support Hash Method"
   end
 
@@ -39,7 +39,7 @@ defmodule Storage do
   """
   def untag(name, reference) do
     name
-    |> Storage.PathSpec.get_tag_path(reference)
+    |> Storage.PathSpec.tag_path(reference)
     |> driver().delete
   end
 
@@ -59,7 +59,7 @@ defmodule Storage do
   end
 
   defp verify_digest(name, "sha256:" <> except_digest = digest) do
-    path = Storage.PathSpec.get_blob_path(name, digest)
+    path = Storage.PathSpec.blob_path(name, digest)
     if except_digest != driver().digest(path) do
       Logger.warn(fn -> "manifest:#{name} verify failed cause:layer:#{digest} invalid" end)
       raise Storage.Exception,
@@ -70,8 +70,8 @@ defmodule Storage do
   end
 
   def commit(name, uuid, digest) do
-    file_name = Storage.PathSpec.get_upload_path(name, uuid)
-    target_name = Storage.PathSpec.get_blob_path(name, digest)
+    file_name = Storage.PathSpec.upload_path(name, uuid)
+    target_name = Storage.PathSpec.blob_path(name, digest)
     driver().move(file_name, target_name)
   end
 
@@ -79,13 +79,13 @@ defmodule Storage do
   保存 Blob 对象
   """
   def save_full_upload(tmp_path, name, uuid) do
-    file_name = Storage.PathSpec.get_upload_path(name, uuid)
+    file_name = Storage.PathSpec.upload_path(name, uuid)
     driver().move(tmp_path, file_name)
     driver().size(file_name)
   end
 
-  def get_manifest(name, reference) do
-    tag_current_path = Storage.PathSpec.get_tag_current_path(name, reference)
+  def manifest(name, reference) do
+    tag_current_path = Storage.PathSpec.tag_current_path(name, reference)
     link = tag_current_path <> "/link"
     if not driver().exists?(link) do
       raise Storage.Exception,
@@ -98,30 +98,30 @@ defmodule Storage do
             }
     end
     digest = driver().read(link)
-    manifest_path = Storage.PathSpec.get_blob_path(name, digest)
+    manifest_path = Storage.PathSpec.blob_path(name, digest)
     driver().read(manifest_path)
   end
   @doc """
   ### Example
-    iex> Storage.get_blob_size("registry", "sha256:3cc64cc451428c45615c1c5a5fe7533f336f2cac22095774a073b61a596b987f")
+    iex> Storage.blob_size("registry", "sha256:3cc64cc451428c45615c1c5a5fe7533f336f2cac22095774a073b61a596b987f")
     1287
-    iex> Storage.get_blob_size("registry2", "sha256:3cc64cc451428c45615c1c5a5fe7533f336f2cac22095774a073b61a596b987f")
+    iex> Storage.blob_size("registry2", "sha256:3cc64cc451428c45615c1c5a5fe7533f336f2cac22095774a073b61a596b987f")
     ** (Storage.Exception) blob unknown
   """
-  def get_blob_size(name, digest) do
-    blob_path = Storage.PathSpec.get_blob_path(name, digest)
+  def blob_size(name, digest) do
+    blob_path = Storage.PathSpec.blob_path(name, digest)
     driver().size(blob_path)
   end
 
   @doc """
   ### Example
-    iex> Storage.get_repo_size("registry")
+    iex> Storage.repo_size("registry")
     10480
-    iex> Storage.get_repo_size("abc")
+    iex> Storage.repo_size("abc")
     ** (Storage.Exception) blob unknown
   """
-  def get_repo_size(name) do
-    repo_path = Storage.PathSpec.get_repo_path(name)
+  def repo_size(name) do
+    repo_path = Storage.PathSpec.repo_path(name)
     driver().size(repo_path)
   end
 
@@ -136,14 +136,14 @@ defmodule Storage do
 
   @doc ~s"""
   ### Example
-    iex> Storage.get_repositories("")
+    iex> Storage.repositories("")
     ["untag", "test/test", "registry"]
-    iex> Storage.get_repositories("test")
+    iex> Storage.repositories("test")
     ["test/test"]
-    iex> Storage.get_repositories("abc")
+    iex> Storage.repositories("abc")
     []
   """
-  def get_repositories(keyword) do
+  def repositories(keyword) do
     prefix = Storage.PathSpec.data_dir
     len = prefix
           |> String.length
@@ -158,7 +158,7 @@ defmodule Storage do
        )
   end
 
-  def get_repositories(keyword, count) do
+  def repositories(keyword, count) do
     prefix = Storage.PathSpec.data_dir
     len = prefix
           |> String.length
@@ -179,13 +179,13 @@ defmodule Storage do
 
   @doc ~s"""
   ### Example
-    iex> Storage.get_tags("registry")
+    iex> Storage.tags("registry")
     ["latest"]
-    iex> Storage.get_repositories("abc")
+    iex> Storage.repositories("abc")
     []
   """
-  def get_tags(name) do
-    tag_path = Storage.PathSpec.get_tags_path(name)
+  def tags(name) do
+    tag_path = Storage.PathSpec.tags_path(name)
     if not driver().exists?(tag_path) do
       raise Storage.Exception,
             message: "repository not found",
@@ -207,12 +207,12 @@ defmodule Storage do
   end
 
   def blob_stream(name, digest) do
-    blob_path = Storage.PathSpec.get_blob_path(name, digest)
+    blob_path = Storage.PathSpec.blob_path(name, digest)
     driver().stream(blob_path)
   end
 
-  def get_blob(name, digest) do
-    blob_path = Storage.PathSpec.get_blob_path(name, digest)
+  def blob(name, digest) do
+    blob_path = Storage.PathSpec.blob_path(name, digest)
     driver().read(blob_path)
   end
 
@@ -226,7 +226,7 @@ defmodule Storage do
     false
   """
   def exists?(name, digest) do
-    blob_path = Storage.PathSpec.get_blob_path(name, digest)
+    blob_path = Storage.PathSpec.blob_path(name, digest)
     driver().exists?(blob_path)
   end
 
@@ -241,7 +241,7 @@ defmodule Storage do
   """
   def exists?(name) do
     name
-    |> Storage.PathSpec.get_tags_path()
+    |> Storage.PathSpec.tags_path()
     |> driver().exists?()
   end
 
@@ -254,7 +254,7 @@ defmodule Storage do
              |> Base.encode16(case: :lower)
 
     digest_name = ~s(#{hash}) <> ":" <> digest
-    target_name = Storage.PathSpec.get_blob_path(name, digest_name)
+    target_name = Storage.PathSpec.blob_path(name, digest_name)
     driver().save(target_name, data)
     digest_name
   end
@@ -287,7 +287,7 @@ defmodule Storage do
   def lock(name) do
     if exists?(name) do
       name
-      |> Storage.PathSpec.get_lock_file
+      |> Storage.PathSpec.lock_file
       |> driver().save(<<"">>)
     else
       {:error, "repo not found"}
@@ -309,7 +309,7 @@ defmodule Storage do
   """
   def unlock(name),
       do: name
-          |> Storage.PathSpec.get_lock_file
+          |> Storage.PathSpec.lock_file
           |> driver().delete()
 
   @doc ~S"""
@@ -317,31 +317,28 @@ defmodule Storage do
   """
   def locked?(name),
       do: name
-          |> Storage.PathSpec.get_lock_file
+          |> Storage.PathSpec.lock_file
           |> driver().exists?()
 
   @doc ~s"""
   Delete the repo
   ### Example
-    iex> Storage.exists?("example")
+    iex> Storage.exists?("registry/example")
     true
-    iex> Storage.delete_repo("example")
+    iex> Storage.delete_repo("registry/example")
     {:error, "repo didn't locked"}
-    iex> Storage.lock("example")
+    iex> Storage.lock("registry/example")
     :ok
-    iex> Storage.delete_repo("example")
-    {:ok,["#{Storage.PathSpec.data_dir()}/example", "#{Storage.PathSpec.data_dir()}/example/_manifests",
-                 "#{Storage.PathSpec.data_dir()}/example/_manifests/tags", "#{
-    Storage.PathSpec.data_dir()
-  }/example/.lock"]}
-    iex> Storage.exists?("example")
+    iex> Storage.delete_repo("registry/example")
+    iex> Storage.exists?("registry/example")
     false
   """
   def delete_repo(name) do
     if locked?(name) do
-      name
-      |> Storage.PathSpec.get_repo_path()
-      |> driver().delete()
+      for path <- Storage.PathSpec.delete_path(name) do
+        driver().delete(path)
+      end
+      {:ok, ""}
     else
       {:error, "repo didn't locked"}
     end

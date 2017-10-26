@@ -10,7 +10,7 @@ defmodule Accelerator.RepoTest do
 
   test "get tags", %{pid: pid, name: name} do
     {:ok, rsp} = GenServer.call(pid, :tags)
-    assert %{"name" => ^name, "tags" => tags} = rsp.data
+    assert %{"name" => ^name, "tags" => _tags} = rsp.data
   end
   test "get manifest", %{pid: pid, name: _name} do
     {:ok, rsp} = GenServer.call(pid, {:manifest, "latest"})

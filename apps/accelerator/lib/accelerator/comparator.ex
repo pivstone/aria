@@ -53,8 +53,8 @@ defmodule Accelerator.Comparator do
   end
 
   def check_storage(name, pid) do
-    for tag <- Storage.get_tags(name) do
-      manifest = Storage.get_manifest(name, tag)
+    for tag <- Storage.tags(name) do
+      manifest = Storage.manifest(name, tag)
       digest = hash(manifest)
       :ets.insert(pid, {[name, tag], digest})
     end

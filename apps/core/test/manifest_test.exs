@@ -24,7 +24,7 @@ defmodule ManifestTest do
   end
 
   test "manifest get config" do
-    config = Manifest.get_config("test/test", "latest")
+    config = Manifest.config("test/test", "latest")
     assert Map.has_key?(config, "Cmd")
     assert Map.has_key?(config, "Env")
     assert Map.has_key?(config, "Volumes")

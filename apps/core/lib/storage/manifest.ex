@@ -17,16 +17,16 @@ defmodule Manifest do
   @doc """
   获取镜像 config
   """
-  def get_config(name, reference) do
+  def config(name, reference) do
     manifest =
       name
-      |> Storage.get_manifest(reference)
+      |> Storage.manifest(reference)
       |> Poison.decode!
-    verison = get_version(manifest)
-    get_config(name, manifest, verison)
+    verison = version(manifest)
+    config(name, manifest, verison)
   end
 
-  def get_config(_name, manifest, 1) do
+  def config(_name, manifest, 1) do
     manifest
       |> Map.fetch!("history")
       |> Enum.at(0)
@@ -35,26 +35,26 @@ defmodule Manifest do
       |> Map.fetch!("config")
   end
 
-  def get_config(name, manifest, 2) do
+  def config(name, manifest, 2) do
     config_digest = manifest["config"]["digest"]
     name
-      |> Storage.get_blob(config_digest)
+      |> Storage.blob(config_digest)
       |> Poison.decode!
       |> Map.fetch!("config")
   end
-  def get_version(%{"schemaVersion" => 2} = _manifest),  do: 2
-  def get_version(%{"schemaVersion" => 1} = _manifest),  do: 1
-  def get_version(%{"schemaVersion" => _} = manifest)  do
+  def version(%{"schemaVersion" => 2} = _manifest),  do: 2
+  def version(%{"schemaVersion" => 1} = _manifest),  do: 1
+  def version(%{"schemaVersion" => _} = manifest)  do
     Logger.warn(fn -> "manifest #{inspect manifest} version error!" end)
     raise Storage.Exception,
       message: "manifest invalid",
       code: "MANIFEST_INVALID",
       plug_status: 400
   end
-  def get_version(plaintext) when is_binary(plaintext) do
+  def version(plaintext) when is_binary(plaintext) do
     plaintext
     |> Poison.decode!
-    |> get_version
+    |> version
   end
   @doc """
   将 v2_v2 版本的 Manifest 转化成 v2_v1 版本
@@ -64,7 +64,7 @@ defmodule Manifest do
   end
   def transform_v2_to_v1(%{} = manifest, name, reference) do
     config_digest = get_in manifest,["config","digest"]
-    config_string = Storage.get_blob(name, config_digest)
+    config_string = Storage.blob(name, config_digest)
     config_data = config_string |> Poison.decode!(as: %Manifest.DockerConfig{container_config: %Manifest.ContainerConfig{}, history: [%Manifest.DockerConfigHistory{}]})
     data = %Manifest.V1Schema{
       schemaVersion: 1,
@@ -166,7 +166,7 @@ defmodule Manifest do
   校验 Manifest 的签名
   """
   def verify(name, plaintext) do
-    version = get_version(plaintext)
+    version = version(plaintext)
     verify(name, plaintext, version)
   end
   @doc """
@@ -188,8 +188,8 @@ defmodule Manifest do
         protected_header = protected
         |> Base.url_decode64!(padding: false)
         |> Poison.decode!
-        payload = get_payload(protected_header, plaintext)
-        jwk = get_verify_key(header)
+        payload = payload(protected_header, plaintext)
+        jwk = verify_key(header)
         verify_key(jwk, %{"payload" => payload, "signature" => Map.fetch!(signature, "signature"), "protected" => protected})
       end
     Enum.all?(result, fn(x) -> x end)
@@ -227,7 +227,7 @@ defmodule Manifest do
     end
     true
   end
-  defp get_payload(protected_data, plaintext) do
+  defp payload(protected_data, plaintext) do
     format_len = Map.fetch!(protected_data, "formatLength")
     tail = protected_data
       |> Map.fetch!("formatTail")
@@ -236,7 +236,7 @@ defmodule Manifest do
     |> Base.url_encode64(padding: false)
   end
 
-  defp get_verify_key(header) do
+  defp verify_key(header) do
     x = get_in(header, ["jwk", "x"])
     y = get_in(header, ["jwk", "y"])
     <<4>> <> Base.url_decode64!(x, padding: false) <> Base.url_decode64!(y, padding: false)
@@ -254,13 +254,13 @@ defmodule Manifest do
   def save(_manifest, nil, _reference), do: Logger.error fn -> "" end
   def save(manifest, name, reference) do
     manifest_digest = Storage.save_manifest(name, manifest)
-    current_tag_path = Storage.PathSpec.get_tag_current_path(name, reference)
+    current_tag_path = Storage.PathSpec.tag_current_path(name, reference)
     Storage.link(manifest_digest, current_tag_path)
-    tag_index_path = Storage.PathSpec.get_tag_index_path(name, reference, manifest_digest)
+    tag_index_path = Storage.PathSpec.tag_index_path(name, reference, manifest_digest)
     Storage.link(manifest_digest, tag_index_path)
 
     # Save reference
-    reference_path = Storage.PathSpec.get_reference_path(name, manifest_digest)
+    reference_path = Storage.PathSpec.reference_path(name, manifest_digest)
     Storage.link(manifest_digest, reference_path)
     # Broadcast manifest signal
     PubSub.broadcast_from Aria.PubSub, self(), "manifest", {:save_manifest, name, reference}

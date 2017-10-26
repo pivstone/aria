@@ -8,7 +8,7 @@ defmodule Api.BlobUploadController do
   def put(conn, %{"name" => name, "digest" => digest, "uuid" => uuid} = _params) do
     locked(name)
     [hash_method, value] = digest |> String.split(":", parts: 2)
-    file_digest = Storage.get_blob_digest(name, uuid, hash_method)
+    file_digest = Storage.blob_digest(name, uuid, hash_method)
     if value != file_digest do
       Logger.warn(fn -> "Blob upload digest didnt match #{file_digest} != #{value}" end)
       raise Storage.Exception,

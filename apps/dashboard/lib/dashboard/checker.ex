@@ -19,7 +19,7 @@ defmodule Dashboard.Checker do
 
   def handle_info(:work, state) do
     Logger.info(fn -> "Dashboard.Checker start working.."  end)
-    for name <- Storage.get_repositories("") do
+    for name <- Storage.repositories("") do
       spawn(fn -> check_repo(name) end)
     end
     Process.send_after self(), :work, 1000 * 60 * 3
@@ -28,7 +28,7 @@ defmodule Dashboard.Checker do
 
   defp check_repo(name) do
     repo = Repo.retrieve(name)
-    tag_list = Storage.get_tags(name)
+    tag_list = Storage.tags(name)
     if repo == nil do
       Logger.info(fn -> "Dashboard.Checker fix repo:#{name}..."  end)
       tags =

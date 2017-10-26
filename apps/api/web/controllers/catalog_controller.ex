@@ -5,13 +5,13 @@ defmodule Api.CatalogController do
 
 
   def get(conn, %{"q" => keyword} = _params) do
-    images = Storage.get_repositories(keyword)
+    images = Storage.repositories(keyword)
     render conn, "catalog.json", %{images: images}
   end
 
 
   def get(conn, %{"n" => num} = _params) do
-    images = Storage.get_repositories("", num)
+    images = Storage.repositories("", num)
     render conn, "catalog.json", %{images: images}
   end
 
@@ -19,7 +19,7 @@ defmodule Api.CatalogController do
   Search repositories
   """
   def get(conn, %{"q" => keyword, "n" => num} = _params) do
-    images = Storage.get_repositories(keyword, num)
+    images = Storage.repositories(keyword, num)
     render conn, "catalog.json", %{images: images}
   end
 
@@ -27,7 +27,7 @@ defmodule Api.CatalogController do
   List reposiotries
   """
   def get(conn, _params) do
-    images = Storage.get_repositories("")
+    images = Storage.repositories("")
     render conn, "catalog.json", %{images: images}
   end
 

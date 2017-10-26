@@ -31,7 +31,7 @@ defmodule Accelerator.Downloader do
   end
 
   defp save_blob(file_name, name, digest) do
-    target_name = Storage.PathSpec.get_blob_path(name, digest)
+    target_name = Storage.PathSpec.blob_path(name, digest)
     Storage.driver().move(file_name, target_name)
   end
 

@@ -38,7 +38,7 @@ defmodule Dashboard.RepoController do
   def manifest(conn, %{"name" => name, "reference" => reference} = _param) do
     body =
       name
-      |> Manifest.get_config(reference)
+      |> Manifest.config(reference)
       |> Poison.encode!
     conn
       |> put_resp_header("content-type", "application/json")
