@@ -26,6 +26,7 @@ defmodule Aria.Mixfile do
   defp deps do
     [
       {:credo, "~> 0.7", only: [:dev, :test]},
+      {:excoveralls, "~> 0.7", only: :test},
     ]
   end
 
