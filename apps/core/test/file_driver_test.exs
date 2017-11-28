@@ -6,6 +6,7 @@ defmodule FileDriverTest do
     dist = System.tmp_dir <> "_test2/data"
 
     File.mkdir(src)
+    File.mkdir(System.tmp_dir <> "_test2")
     src = src <> "/data"
     File.write(src, "test")
     Storage.FileDriver.move(src, dist)

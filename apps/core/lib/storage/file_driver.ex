@@ -1,7 +1,7 @@
 defmodule Storage.FileDriver do
   @moduledoc """
-  File Base 的存储
- """
+   File Base 的存储
+  """
 
   require Logger
   @behaviour Storage.Driver
@@ -13,8 +13,9 @@ defmodule Storage.FileDriver do
     ensure_dir(dist)
     # TODO:  add move test in docker
     with :ok <- File.cp!(src, dist),
-       :ok <- src |> File.rm!,
-    do: :ok
+         :ok <- src
+                |> File.rm!,
+         do: :ok
   end
 
   defp ensure_dir(file_name) do
@@ -37,7 +38,7 @@ defmodule Storage.FileDriver do
     check_file(path)
     path
     |> File.stream!([], 4096)
-    |> Enum.reduce(:crypto.hash_init(:sha256), fn(line, acc) -> :crypto.hash_update(acc, line) end)
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn (line, acc) -> :crypto.hash_update(acc, line) end)
     |> :crypto.hash_final
     |> Base.encode16(case: :lower)
   end
@@ -45,9 +46,7 @@ defmodule Storage.FileDriver do
   @doc """
   获取文件大小
   """
-  def size(path) do
-    size(path, File.dir?(path))
-  end
+  def size(path), do: size(path, File.dir?(path))
 
   def size(path, false) do
     check_file(path)
@@ -67,10 +66,10 @@ defmodule Storage.FileDriver do
         |> String.to_integer
       {"du:" <> reason, 1} ->
         raise Storage.Exception,
-          message: "folder size stat error",
-          code: "FOLDER_SIZE_STAT_ERROR",
-          plug_status: 400,
-          detail: reason
+              message: "folder size stat error",
+              code: "FOLDER_SIZE_STAT_ERROR",
+              plug_status: 400,
+              detail: reason
     end
   end
 
@@ -98,7 +97,7 @@ defmodule Storage.FileDriver do
   @doc """
   List 目录
   """
-  def list(path), do:  Path.wildcard(path)
+  def list(path), do: Path.wildcard(path)
 
   def list(path, keyword), do: Path.wildcard(path, [keyword])
 
@@ -109,9 +108,9 @@ defmodule Storage.FileDriver do
     if not File.exists?(path) do
       Logger.warn(path)
       raise Storage.Exception,
-        message: "blob unknown",
-        code: "BLOB_UNKNOWN",
-        plug_status: 404
+            message: "blob unknown",
+            code: "BLOB_UNKNOWN",
+            plug_status: 404
     end
   end
 
