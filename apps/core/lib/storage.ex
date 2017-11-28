@@ -116,7 +116,7 @@ defmodule Storage do
   @doc """
   ### Example
     iex> Storage.repo_size("registry")
-    10480
+    10456
     iex> Storage.repo_size("abc")
     ** (Storage.Exception) blob unknown
   """
