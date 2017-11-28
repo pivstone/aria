@@ -20,6 +20,6 @@ VERSION
 *.md
 package-lock.json
 .idea/
-_tmp
-data
+_tmp/
+data/
 mix.lock

@@ -35,6 +35,6 @@ _tmp
 # this depending on your deployment strategy.
 /priv/static/
 
-data
+data/
 
 mix.lock
