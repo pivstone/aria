@@ -14,7 +14,3 @@ config :mime, :types, %{
 }
 # Print only warnings and errors during test
 config :logger, level: :warn
-
-
-config :core, Storage.PathSpec,
-       data_dir: System.cwd <> "/_tmp"
