@@ -1,7 +1,6 @@
 defmodule Accelerator.RepoTest do
   alias Accelerator.DockerUrl
   use ExUnit.Case, async: true
-  use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
   setup_all %{} do
     name = "library/busybox"
@@ -32,7 +31,10 @@ defmodule Accelerator.RepoTest do
              |> Map.fetch!("docker-content-digest")
     #digest = "sha256:" <> Accelerator.Checker.hash(rsp.body)
     {:ok, rsp2} = GenServer.call(pid, {:manifest, digest})
-    assert rsp2.body == rsp.body
+    digest2 = rsp2.headers
+                 |> Enum.into(%{})
+                 |> Map.fetch!("docker-content-digest")
+    assert digest == digest2
 
   end
 
@@ -41,7 +43,7 @@ defmodule Accelerator.RepoTest do
     {:ok, %Response{code: 200} = rsp} = GenServer.call(pid, {:manifest, "latest"})
     manifest = Poison.decode!(rsp.body)
     layers = Map.get(manifest, "layers") || Map.fetch!(manifest, "fsLayers")
-    layer = Enum.at(layers, 1)
+    layer = Enum.at(layers, 0)
     digest = Map.get(layer, "digest") || Map.fetch!(layer, "blobSum")
     auth = GenServer.call(pid, :auth)
     url = DockerUrl.blobs(name, digest)

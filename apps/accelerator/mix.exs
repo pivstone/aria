@@ -30,7 +30,6 @@ defmodule Accelerator.Mixfile do
 
   defp deps do
     [
-      {:exvcr, "~> 0.8", only: :test},
       {:httpoison, "~> 0.4"},
       {:poison, "~> 1.5 or ~> 2.0"},
       {:magic, "~> 0.3.0"},
