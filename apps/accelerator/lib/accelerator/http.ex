@@ -23,12 +23,14 @@ defmodule Accelerator.Http do
 
   """
   def request(method, url, headers \\ []) do
-    :hackney.request(method, url, headers, [], [{:follow_redirect, true}])
+    method
+    |> :hackney.request(url, headers, [], [{:follow_redirect, true}])
     |> response
   end
 
   def request(method, url, headers, payload) do
-    :hackney.request(method, url, headers, payload, [{:follow_redirect, true}])
+    method
+    |> :hackney.request(url, headers, payload, [{:follow_redirect, true}])
     |> response
   end
 

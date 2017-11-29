@@ -28,17 +28,9 @@ defmodule Accelerator.Mixfile do
     ]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:my_dep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:my_dep, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
     [
+      {:exvcr, "~> 0.8", only: :test},
       {:httpoison, "~> 0.4"},
       {:poison, "~> 1.5 or ~> 2.0"},
       {:magic, "~> 0.3.0"},
