@@ -1,7 +1,18 @@
 language: elixir
 elixir: '1.5'
+otp_release: 20.1
+sudo: false
 
 env:
   - MIX_ENV=test
 
-script: mix coveralls.travis
+before_script:
+  - mix deps.get
+
+script:
+  - mix test
+
+after_script:
+  - cd $TRAVIS_BUILD_DIR
+  - MIX_ENV=docs mix inch.report
+  - mix coveralls.travis
