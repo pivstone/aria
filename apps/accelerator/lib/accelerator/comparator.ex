@@ -19,6 +19,7 @@ defmodule Accelerator.Comparator do
     case GenServer.call(repo, :tags, 30_000) do
       {:ok, %Response{code: 200} = rsp} ->
         tags = Map.fetch!(rsp.data, "tags")
+        Logger.info fn -> "#{name} tags: #{inspect tags}" end
         if tags == nil do
           Logger.warn fn -> "Fetching #{name}'s tags failed#{inspect rsp}" end
         end
@@ -28,14 +29,15 @@ defmodule Accelerator.Comparator do
             digest = hash(rsp.body)
             case :ets.lookup(cache, [name, tag]) do
               [{[^name, ^tag], ^digest}] ->
-                nil
-              # not update
+                nil # not update
               [{[^name, ^tag], new_digest}] ->
                 :ets.insert(cache, {[name, tag], new_digest})
+                Logger.info fn -> "#{name}'s tag:#{tag} need update" end
                 PubSub.broadcast_from! Aria.PubSub, self(), "accelerator", {:tag_update, new_digest, tag, name}
                 {new_digest, tag, name}
               [] ->
                 :ets.insert(cache, {[name, tag], digest})
+                Logger.info fn -> "#{name} new tag:#{tag} found" end
                 PubSub.broadcast_from! Aria.PubSub, self(), "accelerator", {:new_tag, digest, tag, name}
                 {digest, tag, name}
             end

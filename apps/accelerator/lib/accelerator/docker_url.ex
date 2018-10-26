@@ -1,9 +1,9 @@
 defmodule Accelerator.DockerUrl do
 
-  @upstream "https://hub.c.163.com/v2/"
+  @default_upstream "https://hub.c.163.com/v2/"
 
   def upstream do
-    Application.get_env(:accelerator, __MODULE__, [])[:upstream] || @upstream
+    Application.get_env(:accelerator, __MODULE__, [])[:upstream] || @default_upstream
   end
 
   def auth(name, server, serivce) do
