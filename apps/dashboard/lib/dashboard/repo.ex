@@ -51,7 +51,7 @@ defmodule Dashboard.Repo do
   end
 
   @doc """
-  ### Example
+    ### Example
     iex> name = "123"
     iex> refs = "latest"
     iex> repo = Dashboard.Repo.new(name, refs)
@@ -94,8 +94,8 @@ defmodule Dashboard.Repo do
     iex> Dashboard.Repo.list()
     ["lib/example"]
   """
-  def list(mask \\ :"_") do
-    for [x] <- :dets.match(:meta, {[mask, :"$1"],:"_"}), do: x
+  def list(mask \\ :_) do
+    for [x] <- :dets.match(:meta, {[mask, :"$1"],:_}), do: x
   end
 
   @doc ~S"""
@@ -115,7 +115,7 @@ defmodule Dashboard.Repo do
       ["onbuild", "latest"]
   """
   def retrieve(name) do
-    case :dets.match(:meta, {[:"_", name], :"$1"}, 1) do
+    case :dets.match(:meta, {[:_, name], :"$1"}, 1) do
       {[[result]], _} ->
         result
       _ ->

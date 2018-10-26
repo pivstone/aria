@@ -52,13 +52,13 @@ defmodule Api.ManifestController do
         detail: %{}
     end
     [schema] = get_req_header(conn, "content-type")
-    if schema == nil do
+    if !String.valid?(schema) do
       raise Storage.Exception,
         message: "Manifest Invalid",
         code: "MANIFEST_INVALID",
         plug_status: 400
     end
-    if not schema in [@scheme1, @scheme2] do
+    if schema not in [@scheme1, @scheme2] do
       raise Storage.Exception,
         message: "The operation is unsupported",
         code: "UNSUPPORTED",

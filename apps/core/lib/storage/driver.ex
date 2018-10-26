@@ -2,6 +2,7 @@ defmodule Storage.Driver do
   @moduledoc """
   Documentation for Storage.
   """
+  @type posix :: :file.posix()
 
   @type path :: String.t
 
@@ -9,13 +10,13 @@ defmodule Storage.Driver do
 
   @callback digest(path) :: String.t
 
-  @callback save(path, data :: binary) :: String.t
+  @callback save(path, data :: binary) :: :ok | no_return
 
   @callback size(path) :: non_neg_integer
 
   @callback read(path) :: binary
 
-  @callback stream(path) :: [binary]
+  @callback stream(path) :: File.Stream.t()
 
   @callback list(path) :: [String.t]
 
@@ -23,6 +24,6 @@ defmodule Storage.Driver do
 
   @callback exists?(path) :: true | false
 
-  @callback delete(path) :: :ok | {:error, posix :: String.t}
+  @callback delete(path) :: {:ok, [binary]} | {:error, posix, binary}
 
 end

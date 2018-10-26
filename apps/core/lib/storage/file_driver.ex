@@ -99,7 +99,7 @@ defmodule Storage.FileDriver do
   """
   def list(path), do: Path.wildcard(path)
 
-  def list(path, keyword), do: Path.wildcard(path, [keyword])
+  def list(path, keyword) when is_binary(keyword), do: Path.wildcard(path, [keyword])
 
   @doc """
   检查文件是否存在

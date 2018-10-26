@@ -7,7 +7,7 @@ defmodule Dashboard.RepoController do
   def list(conn, param) do
     body =
       param
-        |> Map.get("mask", :"_")
+        |> Map.get("mask", :_)
         |> Repo.list
         |> Poison.encode!
     conn

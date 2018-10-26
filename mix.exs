@@ -12,7 +12,7 @@ defmodule Aria.Mixfile do
         tool: ExCoveralls
       ],
       preferred_cli_env: [
-        "coveralls": :test,
+        coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
@@ -31,8 +31,8 @@ defmodule Aria.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["test"],
-      "run": ["phoenix.server"]
+      test: ["test"],
+      run: ["phoenix.server"]
     ]
   end
 end
