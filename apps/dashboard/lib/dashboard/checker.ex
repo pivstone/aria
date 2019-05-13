@@ -1,6 +1,6 @@
 defmodule Dashboard.Checker do
   @moduledoc"""
-  定时检查元数据的完整性，如果元数据丢失则自行修复
+  Verify image meta data in schdule, repair meta data if fault is found
   """
   use GenServer
   require Logger

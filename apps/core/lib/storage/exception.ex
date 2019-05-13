@@ -1,6 +1,6 @@
 defmodule Storage.Exception do
   @moduledoc """
-  存储异常
+  storage exception
   """
   defexception [:message, :code, :detail, :plug_status]
 end

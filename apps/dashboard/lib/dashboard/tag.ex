@@ -1,6 +1,6 @@
 defmodule Dashboard.Tag do
   @moduledoc """
-  Repo tag 信息
+  Tag Repo
   """
   defstruct [:name, :updated_time]
 

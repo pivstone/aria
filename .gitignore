@@ -38,3 +38,4 @@ _tmp
 data/
 
 mix.lock
+.elixir_ls

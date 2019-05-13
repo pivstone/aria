@@ -1,6 +1,6 @@
 defmodule Storage.PathSpec do
   @moduledoc """
-  Docker Registry 的文件存储结构
+  Docker Registry Path layout
   ref:[https://github.com/docker/distribution/blob/641f1029677e49faa277f7769797518e973865fd/registry/storage/paths.go#L24]
   The path layout in the storage backend is roughly as follows:
 
@@ -19,12 +19,12 @@ defmodule Storage.PathSpec do
                    <layer links to blob store>
                -> _uploads/<id>
                    data
-                   startedat        # 上传文件的时间而已，个人觉得改成 Info 更合适一些
+                   startedat        # The upload start date
                    hashstates/<algorithm>/<offset>
        -> blob/<algorithm>
            <split directory content addressable storage>
 
-  Aira 的文件存储结构
+  Aira Path layout
   <root>/<name>
     -> _manifests/
             revisions
@@ -43,7 +43,7 @@ defmodule Storage.PathSpec do
   end
 
   @doc """
-  上传文件的临时路径
+  Upload file temporary path
   :param name:
   :param uuid:
   :return:
@@ -53,7 +53,7 @@ defmodule Storage.PathSpec do
   end
 
   @doc """
-  上传完成后的 blob 路径
+  The uploaded blob path
   :param digest:
   :param name: repository name
   :return:
@@ -72,7 +72,7 @@ defmodule Storage.PathSpec do
   end
 
   @doc """
-  获取指定 tag 文件的路径
+  Return tag file path
   :param name: image name
   :param tag_name: tag name
   :return:
@@ -105,7 +105,7 @@ defmodule Storage.PathSpec do
     "#{data_dir()}/#{name}/.lock"
   end
   @doc """
-  获取需要删除的数据路径
+  List of delete target path
   """
   def delete_path(name) do
     [

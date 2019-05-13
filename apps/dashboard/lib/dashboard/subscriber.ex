@@ -1,6 +1,6 @@
 defmodule Dashboard.Subscriber do
   @moduledoc"""
-  注册和处理 其他模块的 signal
+  Register and handle module signals
   """
 
   use GenServer
@@ -25,7 +25,7 @@ defmodule Dashboard.Subscriber do
   end
 
   @doc """
-  保存新建的镜像信息
+  Save new image meta data
   """
   def handle_info({:save_manifest, name, reference}, state) do
     Repo.insert(name, reference)
@@ -33,7 +33,7 @@ defmodule Dashboard.Subscriber do
   end
 
   @doc """
-  Subscriber 延迟启动的操作
+  Subscribe topic after init
   """
   def handle_info(:after_init, state) do
     PubSub.subscribe(Aria.PubSub, "manifest")

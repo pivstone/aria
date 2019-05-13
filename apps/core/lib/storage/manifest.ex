@@ -1,6 +1,6 @@
 defmodule Manifest do
   @moduledoc """
-  Manifest的想改操作集合
+  Manifest
   """
 
   alias Phoenix.PubSub
@@ -15,7 +15,7 @@ defmodule Manifest do
   @layer_type  "application/vnd.docker.image.rootfs.diff.tar.gzip"
 
   @doc """
-  获取镜像 config
+  Return docker image config
   """
   def config(name, reference) do
     manifest =
@@ -57,7 +57,7 @@ defmodule Manifest do
     |> version
   end
   @doc """
-  将 v2_v2 版本的 Manifest 转化成 v2_v1 版本
+  transform v2_v2 version Manifest to v2_v1 version
   """
   def transform_v2_to_v1(manifest, name, reference) when is_binary(manifest) do
     transform_v2_to_v1(Poison.decode!(manifest), name, reference)
@@ -74,7 +74,7 @@ defmodule Manifest do
       history: [],
       fsLayers: [],
     }
-    # 最后一层额外处理
+    # handle last layer image config
     {last, layers} = List.pop_at(config_data.history, -1)
     {data, _, parent_id} =
       Enum.reduce(layers, {data, -1, ""} , fn layer, {data, layer_count, parent_id} ->
@@ -92,8 +92,8 @@ defmodule Manifest do
           end
         fs_layers = [%Manifest.FsLayers{blobSum: blob_sum}| data.fsLayers]
         data = %{data | fsLayers: fs_layers}
-        # 构建 v1Compatibility 内容
-        # 计算 blobSum
+        # build v1Compatibility value
+        # calc blobSum
         v1_id = :sha256
           |> :crypto.hash_init()
           |> :crypto.hash_update(blob_sum <> " " <> parent_id)
@@ -112,8 +112,6 @@ defmodule Manifest do
         data = %{data | history: history}
         {data, layer_count, parent_id}
       end)
-    # 处理最后一层,最后一层可能会有兼容性问题
-    # 主要是 config_string 的格式不明朗
     last_layer = config_data |> Map.from_struct
     blob_sum =
       manifest
@@ -135,7 +133,7 @@ defmodule Manifest do
   end
 
   @doc"""
-  Manifest V2 v1 的签名
+  Manifest V2 v1 JWT sign
   """
   def sign(manifest) do
     {<<4, x::binary-size(32), y::binary-size(32)>>, priv} = :crypto.generate_key(:ecdh, :secp256r1)
@@ -163,14 +161,14 @@ defmodule Manifest do
   end
 
   @doc """
-  校验 Manifest 的签名
+  Verify Signature of Manifest
   """
   def verify(name, plaintext) do
     version = version(plaintext)
     verify(name, plaintext, version)
   end
   @doc """
-  校验 Manifest V1 的签名
+  Verify of v1 Manifest signature
   """
   def verify(name, plaintext, 1) do
     manifest = Poison.decode!(plaintext, as: %Manifest.V1Schema{fsLayers: [%Manifest.FsLayers{}], history: [%Manifest.V1History{}]})
@@ -196,7 +194,7 @@ defmodule Manifest do
   end
 
   @doc """
-  校验 Manifest V1 的签名
+  Verify of v2 Manifest signature
   """
   def verify(name, plaintext, 2) do
     manifest = Poison.decode!(plaintext)

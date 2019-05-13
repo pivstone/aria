@@ -9,7 +9,7 @@ config :dashboard, Dashboard.Repo,
        registry_host: "reg.example.com"
 
 config :accelerator, Accelerator.DockerUrl,
-       upstream: "https://hub.c.163.com/v2/"
+       upstream: "https://registry-1.docker.io/v2/"
 
 
 # In this file, we keep production configuration that

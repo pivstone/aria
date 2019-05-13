@@ -1,6 +1,6 @@
 defmodule Dashboard.Repo do
   @moduledoc """
-  Repo 的元信息
+  Meta Data Repo
   """
 
   use GenServer

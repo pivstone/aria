@@ -1,6 +1,6 @@
 defmodule Accelerator.DockerUrl do
 
-  @default_upstream "https://hub.c.163.com/v2/"
+  @default_upstream "https://registry-1.docker.io/v2/"
 
   def upstream do
     Application.get_env(:accelerator, __MODULE__, [])[:upstream] || @default_upstream

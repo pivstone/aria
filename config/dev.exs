@@ -31,6 +31,3 @@ config :dashboard, Dashboard.Repo,
 
 config :accelerator, Accelerator.DockerUrl,
        upstream: "https://registry-1.docker.io/v2/"
-
-#config :accelerator, Accelerator.DockerUrl,
-#       upstream: "https://hub.c.163.com/v2/"

@@ -1,12 +1,12 @@
 defprotocol Core.Exception do
 
   @moduledoc """
-  异常处理 handler
+  Exception handler
   """
 
   @fallback_to_any true
   @doc """
-  渲染异常显示的 body
+  Exception page rendered body
 
   ### Example
     def status(NotAuthenticatedException), do: %{"msg" => "unauthriozed"}
@@ -16,7 +16,7 @@ defprotocol Core.Exception do
 
   @fallback_to_any true
   @doc """
-  准备异常返回的 headers (例如 BasicAuth 的 301 等)
+  Exception http status code & header
 
   ### Example
 
@@ -29,7 +29,7 @@ defprotocol Core.Exception do
 
   @fallback_to_any true
   @doc """
-  异常的状态码
+  Exception status code
 
   ### Example
 

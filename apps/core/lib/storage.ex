@@ -9,7 +9,7 @@ defmodule Storage do
   end
 
   @doc """
-  获取 Blob 文件的 Digest 值
+  Return Blob SHA256 value
   """
   def blob_digest(name, uuid, hash_method) when hash_method == "sha256" do
     uuid_path = Storage.PathSpec.upload_path(name, uuid)
@@ -76,7 +76,7 @@ defmodule Storage do
   end
 
   @doc """
-  保存 Blob 对象
+  Save Blob object
   """
   def save_full_upload(tmp_path, name, uuid) do
     file_name = Storage.PathSpec.upload_path(name, uuid)
@@ -126,7 +126,7 @@ defmodule Storage do
   end
 
   @doc """
-  创建上传的文件时候的 Blob 文件
+  create temporary file blob
   """
   def create_blob(_name) do
     32
@@ -271,7 +271,7 @@ defmodule Storage do
   end
 
   @doc ~S"""
-  锁定镜像，进入只读模式
+  lock docker image as readonly
   ### Example
     iex> Storage.locked?("registry")
     false
@@ -294,7 +294,7 @@ defmodule Storage do
     end
   end
   @doc ~s"""
-  解除锁定镜像
+  unlock docker image and allow write operation
   ### Example
     iex> Storage.locked?("test/test")
     false

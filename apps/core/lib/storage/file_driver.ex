@@ -1,13 +1,14 @@
 defmodule Storage.FileDriver do
   @moduledoc """
-   File Base 的存储
+  Local File Driver
   """
 
   require Logger
   @behaviour Storage.Driver
 
+  @type path :: String.t
   @doc """
-  文件移动
+  File move
   """
   def move(src, dist) do
     ensure_dir(dist)
@@ -32,7 +33,7 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  获取文件的 sha256 值
+  Return file's SHA256 value
   """
   def digest(path) do
     check_file(path)
@@ -44,7 +45,7 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  获取文件大小
+  Return size of file
   """
   def size(path), do: size(path, File.dir?(path))
 
@@ -55,7 +56,7 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  获取文件夹大小
+  Return size of directoy
   """
   def size(path, true) do
     case System.cmd("du", ["-sk", "#{path}"], [stderr_to_stdout: true]) do
@@ -74,7 +75,7 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  获取文件内容
+  Read file content
   """
   def read(path) do
     check_file(path)
@@ -82,12 +83,12 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  检查文件是否存在
+  Check the file exitsts or not
   """
   def exists?(path), do: File.exists?(path)
 
   @doc """
-  获取文件流
+  Return File IO Stream
   """
   def stream(path) do
     check_file(path)
@@ -95,14 +96,14 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  List 目录
+  List of directory
   """
   def list(path), do: Path.wildcard(path)
 
   def list(path, keyword) when is_binary(keyword), do: Path.wildcard(path, [keyword])
 
   @doc """
-  检查文件是否存在
+  Check if the file is exist
   """
   def check_file(path) do
     if not File.exists?(path) do
@@ -115,7 +116,7 @@ defmodule Storage.FileDriver do
   end
 
   @doc """
-  文件存储
+  Save data to file
   """
   def save(path, data) do
     ensure_dir(path)
