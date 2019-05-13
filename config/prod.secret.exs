@@ -1,16 +1,10 @@
 use Mix.Config
 
+config :core, Storage.PathSpec, data_dir: System.cwd() <> "/data"
 
-config :core, Storage.PathSpec,
-       data_dir: System.cwd <> "/data"
+config :dashboard, Dashboard.Repo, registry_host: "reg.example.com"
 
-
-config :dashboard, Dashboard.Repo,
-       registry_host: "reg.example.com"
-
-config :accelerator, Accelerator.DockerUrl,
-       upstream: "https://registry-1.docker.io/v2/"
-
+config :accelerator, Accelerator.DockerUrl, upstream: "https://registry-1.docker.io/v2/"
 
 # In this file, we keep production configuration that
 # you likely want to automate and keep it away from
@@ -21,7 +15,4 @@ config :accelerator, Accelerator.DockerUrl,
 # kept out of version control and might be hard to recover
 # or recreate for your teammates (or you later on).
 config :server, Server.Endpoint,
-       secret_key_base: "1Jg/8G80nlLdluGbE+4YiyrDmLquNqh+4jT3lvGopY779MkgnVrcltoOT3DysFGA"
-
-
-
+  secret_key_base: "1Jg/8G80nlLdluGbE+4YiyrDmLquNqh+4jT3lvGopY779MkgnVrcltoOT3DysFGA"

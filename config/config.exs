@@ -36,4 +36,4 @@ config :mime, :types, %{
   "application/vnd.docker.distribution.manifest.list.v2+json" => ["manifest.v2.list-json"]
 }
 
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

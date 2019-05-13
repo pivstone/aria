@@ -4,8 +4,8 @@ defmodule Aria.Mixfile do
   def project do
     [
       apps_path: "apps",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
       test_coverage: [
@@ -16,14 +16,14 @@ defmodule Aria.Mixfile do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
-      ],
+      ]
     ]
   end
 
   defp deps do
     [
       {:credo, "~> 0.7", only: [:dev, :test]},
-      {:excoveralls, "~> 0.7", only: :test},
+      {:excoveralls, "~> 0.7", only: :test}
     ]
   end
 

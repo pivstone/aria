@@ -1,6 +1,5 @@
 use Mix.Config
 
-
 # For production, we configure the host to read the PORT
 # from the system environment. Therefore, you will need
 # to set PORT=80 before running your server.
@@ -22,9 +21,6 @@ config :server,
          port: {:system, "PORT"}
        ],
        cache_static_manifest: "priv/static/manifest.json"
-
-
-
 
 # ## SSL Support
 #
@@ -66,7 +62,6 @@ config :server,
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
 
-
 # Do not print debug messages in production
 config :logger, level: :info
 
@@ -75,11 +70,6 @@ config :logger,
        format: "$time $metadata[$level] $message\n",
        metadata: [:request_id]
 
-
-
-config :core, Storage,
-       driver: Storage.FileDriver
-
-
+config :core, Storage, driver: Storage.FileDriver
 
 import_config "prod.secret.exs"
