@@ -115,8 +115,8 @@ defmodule Storage do
 
   @doc """
   ### Example
-    iex> Storage.repo_size("registry")
-    10456
+    iex> Storage.repo_size("registry") >= 10456
+    true
     iex> Storage.repo_size("abc")
     ** (Storage.Exception) blob unknown
   """
@@ -260,8 +260,8 @@ defmodule Storage do
   end
 
   @doc """
-  Link Blob 到指定目录
-  :param digest: sha256：XXX 格式的
+  Link Blob to with specific path
+  :param digest: sha256 value
   :param target:
   :return:
   """
